@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- תגיות למניעת שמירת גירסה ישנה בזיכרון המטמון -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -57,9 +56,29 @@
         </div>
     </div>
 
-    <!-- טופס הוספת תנועה -->
+    <!-- הגדרת הוצאות / הכנסות קבועות -->
     <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-gray-100">
-        <h2 class="text-lg font-bold text-gray-800 mb-4">הוספת תנועה</h2>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold text-gray-800">קבועות (תשלומים חודשיים)</h2>
+            <button onclick="toggleRecurringForm()" class="text-xs bg-indigo-50 text-indigo-600 font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-100">+ הוסף קבועה</button>
+        </div>
+
+        <form id="recurringForm" onsubmit="addRecurring(event)" class="hidden mb-4 p-4 bg-gray-50 rounded-xl space-y-3">
+            <div class="grid grid-cols-2 gap-2 p-1 bg-gray-200 rounded-lg">
+                <button type="button" id="recBtnExpense" onclick="setRecType('expense')" class="py-1 rounded font-bold text-xs bg-rose-500 text-white">הוצאה קבועה</button>
+                <button type="button" id="recBtnIncome" onclick="setRecType('income')" class="py-1 rounded font-bold text-xs text-gray-600">הכנסה קבועה</button>
+            </div>
+            <input type="text" id="recDescInput" required placeholder="תיאור (למשל: שכירות / משכורת)" class="w-full p-2 border rounded-lg text-sm">
+            <input type="number" step="any" id="recAmountInput" required placeholder="סכום קבוע (₪)" class="w-full p-2 border rounded-lg text-sm">
+            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg text-sm">שמור לתבנית הקבועה</button>
+        </form>
+
+        <div id="recurringList" class="space-y-2"></div>
+    </div>
+
+    <!-- טופס הוספת תנועה חד-פעמית -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-gray-100">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">הוספת תנועה חד פעמית</h2>
         <form id="transactionForm" onsubmit="addTransaction(event)" class="space-y-4">
             <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
                 <button type="button" id="btnExpense" onclick="setType('expense')" class="py-2 rounded-lg font-bold text-sm bg-rose-500 text-white shadow-sm transition">הוצאה</button>
@@ -84,6 +103,7 @@
                         <option value="חשבונות ודיור">חשבונות ודיור</option>
                         <option value="תחבורה">תחבורה</option>
                         <option value="פנאי ובילויים">פנאי ובילויים</option>
+                        <option value="קבועות">קבועות</option>
                         <option value="משכורת">משכורת</option>
                     </select>
                 </div>
@@ -105,7 +125,6 @@
     </div>
 
     <script>
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDL-TvU-NDdt_mIR0R0nG85IeA2q7tHID0",
             authDomain: "mi-budget-5dd37.firebaseapp.com",
@@ -120,27 +139,29 @@
         const db = firebase.firestore();
 
         let currentType = 'expense';
+        let recCurrentType = 'expense';
         let currentDate = new Date();
         let myChart = null;
 
         function setType(type) {
             currentType = type;
-            const btnExpense = document.getElementById('btnExpense');
-            const btnIncome = document.getElementById('btnIncome');
-            if (type === 'expense') {
-                btnExpense.className = "py-2 rounded-lg font-bold text-sm bg-rose-500 text-white shadow-sm transition";
-                btnIncome.className = "py-2 rounded-lg font-bold text-sm text-gray-600 transition";
-            } else {
-                btnIncome.className = "py-2 rounded-lg font-bold text-sm bg-emerald-500 text-white shadow-sm transition";
-                btnExpense.className = "py-2 rounded-lg font-bold text-sm text-gray-600 transition";
-            }
+            document.getElementById('btnExpense').className = type === 'expense' ? "py-2 rounded-lg font-bold text-sm bg-rose-500 text-white shadow-sm transition" : "py-2 rounded-lg font-bold text-sm text-gray-600 transition";
+            document.getElementById('btnIncome').className = type === 'income' ? "py-2 rounded-lg font-bold text-sm bg-emerald-500 text-white shadow-sm transition" : "py-2 rounded-lg font-bold text-sm text-gray-600 transition";
+        }
+
+        function setRecType(type) {
+            recCurrentType = type;
+            document.getElementById('recBtnExpense').className = type === 'expense' ? "py-1 rounded font-bold text-xs bg-rose-500 text-white" : "py-1 rounded font-bold text-xs text-gray-600";
+            document.getElementById('recBtnIncome').className = type === 'income' ? "py-1 rounded font-bold text-xs bg-emerald-500 text-white" : "py-1 rounded font-bold text-xs text-gray-600";
         }
 
         function toggleList() {
-            const container = document.getElementById('transactionsListContainer');
-            const chevron = document.getElementById('listChevron');
-            container.classList.toggle('hidden');
-            chevron.classList.toggle('rotate-180');
+            document.getElementById('transactionsListContainer').classList.toggle('hidden');
+            document.getElementById('listChevron').classList.toggle('rotate-180');
+        }
+
+        function toggleRecurringForm() {
+            document.getElementById('recurringForm').classList.toggle('hidden');
         }
 
         function changeMonth(delta) {
@@ -155,14 +176,33 @@
             const category = document.getElementById('categoryInput').value;
 
             db.collection('transactions').add({
-                desc,
-                amount,
-                category,
-                type: currentType,
+                desc, amount, category, type: currentType,
                 date: firebase.firestore.Timestamp.fromDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), new Date().getDate()))
             }).then(() => {
                 document.getElementById('transactionForm').reset();
                 setType('expense');
+            });
+        }
+
+        function addRecurring(e) {
+            e.preventDefault();
+            const desc = document.getElementById('recDescInput').value;
+            const amount = parseFloat(document.getElementById('recAmountInput').value);
+
+            db.collection('recurring').add({ desc, amount, type: recCurrentType }).then(() => {
+                document.getElementById('recurringForm').reset();
+                toggleRecurringForm();
+            });
+        }
+
+        function deleteRecurring(id) {
+            db.collection('recurring').doc(id).delete();
+        }
+
+        function applyRecurringToMonth(desc, amount, type) {
+            db.collection('transactions').add({
+                desc, amount, category: 'קבועות', type,
+                date: firebase.firestore.Timestamp.fromDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
             });
         }
 
@@ -173,10 +213,36 @@
         function loadData() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            
             const monthNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
             document.getElementById('currentMonthYear').innerText = `${monthNames[month]} ${year}`;
 
+            // טעינת תבניות קבועות
+            db.collection('recurring').onSnapshot(snapshot => {
+                const recListEl = document.getElementById('recurringList');
+                recListEl.innerHTML = '';
+                if (snapshot.empty) {
+                    recListEl.innerHTML = '<div class="text-center text-gray-400 text-xs py-2">אין הוצאות/הכנסות קבועות מוגדרות</div>';
+                }
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    const item = document.createElement('div');
+                    item.className = "flex justify-between items-center p-2 bg-gray-50 rounded-lg text-xs";
+                    item.innerHTML = `
+                        <div>
+                            <span class="font-bold text-gray-800">${data.desc}</span>
+                            <span class="${data.type === 'income' ? 'text-emerald-600' : 'text-rose-600'} font-bold mr-2">(${data.amount} ₪)</span>
+                        </div>
+                        <div class="flex space-x-2 space-x-reverse">
+                            <button onclick="applyRecurringToMonth('${data.desc}', ${data.amount}, '${data.type}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs">הזן לחודש זה</button>
+                            <button onclick="deleteRecurring('${id}')" class="text-gray-400 hover:text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                    recListEl.appendChild(item);
+                });
+            });
+
+            // טעינת תנועות החודש
             const startOfMonth = new Date(year, month, 1);
             const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
 
@@ -242,20 +308,12 @@
             const labels = Object.keys(categoryTotals);
             const data = Object.values(categoryTotals);
 
-            if (myChart) {
-                myChart.destroy();
-            }
+            if (myChart) myChart.destroy();
 
             if (data.length === 0) {
                 myChart = new Chart(ctx, {
                     type: 'doughnut',
-                    data: {
-                        labels: ['אין הוצאות'],
-                        datasets: [{
-                            data: [1],
-                            backgroundColor: ['#e5e7eb']
-                        }]
-                    },
+                    data: { labels: ['אין הוצאות'], datasets: [{ data: [1], backgroundColor: ['#e5e7eb'] }] },
                     options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
                 });
                 return;
@@ -267,15 +325,11 @@
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: [
-                            '#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'
-                        ]
+                        backgroundColor: ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899']
                     }]
                 },
                 options: {
-                    plugins: {
-                        legend: { position: 'bottom', labels: { font: { family: 'Assistant' } } }
-                    },
+                    plugins: { legend: { position: 'bottom', labels: { font: { family: 'Assistant' } } } },
                     responsive: true,
                     maintainAspectRatio: false
                 }
