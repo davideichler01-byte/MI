@@ -19,141 +19,68 @@
       --border: #e2e8f0;
       --radius: 16px;
     }
-
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-
     body {
       background-color: var(--bg);
       color: var(--text-main);
-      margin: 0; padding: 0; padding-bottom: 90px;
+      margin: 0; padding: 16px;
       display: flex; justify-content: center;
     }
-
-    .app-container { width: 100%; max-width: 600px; padding: 16px; }
-
+    .app-container { width: 100%; max-width: 600px; padding-bottom: 80px; }
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     header h1 { font-size: 20px; font-weight: 700; margin: 0; }
-    
     .month-picker {
       display: flex; align-items: center; gap: 8px;
-      background: var(--surface); padding: 4px 12px;
+      background: var(--surface); padding: 6px 12px;
       border-radius: 20px; border: 1px solid var(--border);
     }
     .month-btn { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--primary); font-weight: bold; }
-    .month-label { font-size: 13px; font-weight: 600; color: var(--text-main); min-width: 90px; text-align: center; }
-
-    .recurring-action-bar { display: flex; gap: 8px; margin-bottom: 16px; }
-    .btn-secondary {
-      flex: 1; background: var(--surface); color: var(--primary);
-      border: 1px solid var(--primary); padding: 10px; border-radius: var(--radius);
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      display: flex; justify-content: center; align-items: center; gap: 6px;
+    .month-label { font-size: 14px; font-weight: 600; color: var(--text-main); min-width: 90px; text-align: center; }
+    .card {
+      background: var(--surface); border-radius: var(--radius);
+      padding: 16px; margin-bottom: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-
-    .balance-card {
-      background: linear-gradient(135deg, #4f46e5, #3730a3);
-      color: white; padding: 20px; border-radius: var(--radius);
-      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
-      margin-bottom: 16px; text-align: center;
-    }
-    .balance-card span { font-size: 13px; opacity: 0.85; }
-    .balance-card h2 { font-size: 30px; margin: 6px 0 0 0; font-weight: 800; }
-
-    /* קוביות קליקביליות */
-    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .sum-card {
-      background: var(--surface); padding: 14px; border-radius: var(--radius);
-      border: 2px solid transparent; display: flex; flex-direction: column; gap: 4px;
-      cursor: pointer; transition: all 0.2s ease; position: relative;
-    }
-    .sum-card:hover { transform: translateY(-2px); }
-    .sum-card.income { background: var(--income-bg); border-color: #a7f3d0; }
-    .sum-card.expense { background: var(--expense-bg); border-color: #fecaca; }
-    .sum-card.active { box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); }
-
-    .sum-header { display: flex; justify-content: space-between; align-items: center; }
-    .sum-title { font-size: 12px; color: var(--text-muted); font-weight: 600; }
-    .sum-arrow { font-size: 12px; transition: transform 0.2s; }
-    .sum-amount { font-size: 18px; font-weight: 700; }
-    .sum-card.income .sum-amount { color: var(--income); }
-    .sum-card.expense .sum-amount { color: var(--expense); }
-
-    .chart-container {
-      background: var(--surface); padding: 16px; border-radius: var(--radius);
-      border: 1px solid var(--border); margin-bottom: 20px; display: none;
-    }
-    .chart-container h3 { font-size: 14px; margin: 0 0 12px 0; color: var(--text-muted); }
-
-    /* רשימת תנועות נגללת */
-    .drawer-container {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 16px; margin-bottom: 20px;
-      display: none; animation: fadeIn 0.25s ease-in-out;
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-
-    .drawer-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; }
-    .transactions-list { display: flex; flex-direction: column; gap: 10px; }
-    
-    .transaction-item {
-      background: var(--bg); padding: 12px 16px; border-radius: 12px;
-      border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
-    }
-    .t-left { display: flex; align-items: center; gap: 12px; }
-    .t-icon { font-size: 20px; background: var(--surface); width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
-    .t-info { display: flex; flex-direction: column; gap: 2px; }
-    .t-title { font-weight: 600; font-size: 14px; }
-    .t-meta { font-size: 11px; color: var(--text-muted); }
-    .t-amount { font-weight: 700; font-size: 15px; }
-    .t-amount.income { color: var(--income); }
-    .t-amount.expense { color: var(--expense); }
-
-    .delete-btn { background: none; border: none; color: #cbd5e1; font-size: 16px; cursor: pointer; padding: 4px; }
-    .delete-btn:hover { color: var(--expense); }
-
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px);
-      display: none; justify-content: center; align-items: flex-end; z-index: 1000;
-    }
-    @media (min-width: 640px) { .modal-overlay { align-items: center; } }
-    .modal {
-      background: var(--surface); width: 100%; max-width: 500px; padding: 24px;
-      border-top-left-radius: 24px; border-top-right-radius: 24px;
-      box-shadow: 0 -10px 25px rgba(0,0,0,0.1); animation: slideUp 0.2s ease-out;
-      max-height: 85vh; overflow-y: auto;
-    }
-    @media (min-width: 640px) { .modal { border-radius: var(--radius); } }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .modal-header h3 { margin: 0; font-size: 18px; }
-    .close-btn { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
-
+    .balance-title { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+    .balance-amount { font-size: 32px; font-weight: 800; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .stat-box { padding: 12px; border-radius: 12px; }
+    .stat-box.income { background: var(--income-bg); color: var(--income); }
+    .stat-box.expense { background: var(--expense-bg); color: var(--expense); }
+    .stat-label { font-size: 12px; margin-bottom: 2px; opacity: 0.9; }
+    .stat-value { font-size: 18px; font-weight: 700; }
     .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted); }
     input, select {
-      width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; outline: none; background: #f8fafc;
+      width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid var(--border); font-size: 15px; outline: none;
     }
-    input:focus, select:focus { border-color: var(--primary); background: #fff; }
-
-    .btn-submit {
-      width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px;
+    .type-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+    .type-btn {
+      flex: 1; padding: 10px; border: 1px solid var(--border);
+      border-radius: 8px; background: var(--surface);
+      font-weight: 600; cursor: pointer; text-align: center;
     }
-
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--surface); border-top: 1px solid var(--border);
-      display: flex; justify-content: space-around; align-items: center;
-      padding: 10px 0; z-index: 100;
+    .type-btn.active.income { background: var(--income-bg); border-color: var(--income); color: var(--income); }
+    .type-btn.active.expense { background: var(--expense-bg); border-color: var(--expense); color: var(--expense); }
+    .submit-btn {
+      width: 100%; padding: 12px; background: var(--primary);
+      color: white; border: none; border-radius: 8px;
+      font-size: 16px; font-weight: 600; cursor: pointer;
     }
-    .fab-btn {
-      background: var(--primary); color: white; border: none;
-      width: 52px; height: 52px; border-radius: 50%;
-      font-size: 24px; display: flex; justify-content: center; align-items: center;
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4); cursor: pointer;
-      transform: translateY(-15px);
+    .item-list { list-style: none; padding: 0; margin: 0; }
+    .item-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
     }
+    .item-info { display: flex; flex-direction: column; }
+    .item-title { font-weight: 600; font-size: 15px; }
+    .item-date { font-size: 12px; color: var(--text-muted); }
+    .item-amount { font-weight: 700; font-size: 15px; }
+    .item-amount.income { color: var(--income); }
+    .item-amount.expense { color: var(--expense); }
+    .delete-btn { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px 8px; }
   </style>
 </head>
 <body>
@@ -162,460 +89,160 @@
   <header>
     <h1>תקציב אישי</h1>
     <div class="month-picker">
-      <button class="month-btn" onclick="changeMonth(-1)">›</button>
-      <span class="month-label" id="month-display"></span>
-      <button class="month-btn" onclick="changeMonth(1)">‹</button>
+      <button class="month-btn" id="prevMonth">&gt;</button>
+      <span class="month-label" id="currentMonthLabel"></span>
+      <button class="month-btn" id="nextMonth">&lt;</button>
     </div>
   </header>
 
-  <div class="recurring-action-bar">
-    <button class="btn-secondary" onclick="openRecurringModal()">⚙️ עריכת סעיפים קבועים</button>
-  </div>
-
-  <div class="balance-card">
-    <span>מאזן חודשי נטו</span>
-    <h2 id="net-balance">₪0</h2>
-  </div>
-
-  <!-- קוביות לחיצות -->
-  <div class="summary-grid">
-    <div class="sum-card income" id="income-card" onclick="toggleDrawer('income')">
-      <div class="sum-header">
-        <span class="sum-title">הכנסות החודש</span>
-        <span class="sum-arrow" id="income-arrow">▼</span>
+  <div class="card">
+    <div class="balance-title">מאזן חודשי</div>
+    <div class="balance-amount" id="totalBalance">₪0</div>
+    <div class="stats-grid">
+      <div class="stat-box income">
+        <div class="stat-label">הכנסות</div>
+        <div class="stat-value" id="totalIncome">₪0</div>
       </div>
-      <span class="sum-amount" id="total-income">₪0</span>
-    </div>
-    <div class="sum-card expense" id="expense-card" onclick="toggleDrawer('expense')">
-      <div class="sum-header">
-        <span class="sum-title">הוצאות החודש</span>
-        <span class="sum-arrow" id="expense-arrow">▼</span>
+      <div class="stat-box expense">
+        <div class="stat-label">הוצאות</div>
+        <div class="stat-value" id="totalExpense">₪0</div>
       </div>
-      <span class="sum-amount" id="total-expense">₪0</span>
     </div>
   </div>
 
-  <!-- מגירת תנועות שנפתחת בלחיצה -->
-  <div class="drawer-container" id="drawer-container">
-    <div class="drawer-title" id="drawer-title">פירוט תנועות</div>
-    <div class="transactions-list" id="drawer-list"></div>
-  </div>
-
-  <div class="chart-container" id="chart-box">
-    <h3>התפלגות הוצאות החודש</h3>
-    <canvas id="expenseChart" style="max-height: 220px;"></canvas>
-  </div>
-</div>
-
-<div class="bottom-nav">
-  <button class="fab-btn" onclick="openModal()">+</button>
-</div>
-
-<!-- מודאל הוספת תנועה חד פעמית -->
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>הוספת תנועה חד פעמית</h3>
-      <button class="close-btn" onclick="closeModal()">✕</button>
+  <div class="card">
+    <h3 style="margin-top:0; margin-bottom:12px; font-size:16px;">הוספת תנועה</h3>
+    <div class="type-selector">
+      <div class="type-btn active expense" id="typeExpense">הוצאה</div>
+      <div class="type-btn income" id="typeIncome">הכנסה</div>
     </div>
-    <form id="transaction-form">
-      <div class="form-group">
-        <label>סוג תנועה</label>
-        <select id="type" onchange="updateCategories('type', 'category')" required>
-          <option value="expense">הוצאה</option>
-          <option value="income">הכנסה</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>סכום (₪)</label>
-        <input type="number" id="amount" step="0.01" placeholder="0.00" required>
-      </div>
-      <div class="form-group">
-        <label>קטגוריה</label>
-        <select id="category" required></select>
-      </div>
-      <div class="form-group">
-        <label>תיאור / פריט</label>
-        <input type="text" id="description" placeholder="תיאור התנועה" required>
-      </div>
-      <div class="form-group">
-        <label>תאריך</label>
-        <input type="date" id="date" required>
-      </div>
-      <button type="submit" class="btn-submit">שמירה</button>
-    </form>
-  </div>
-</div>
-
-<!-- מודאל ניהול קבועים -->
-<div class="modal-overlay" id="recurring-modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>הוספת / עריכת קבועים</h3>
-      <button class="close-btn" onclick="closeRecurringModal()">✕</button>
+    <div class="form-group">
+      <label>תיאור</label>
+      <input type="text" id="descInput" placeholder="לדוגמה: סופרמרקט">
     </div>
-    
-    <form id="recurring-form" style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
-      <div class="form-group">
-        <label>סוג</label>
-        <select id="rec-type" onchange="updateCategories('rec-type', 'rec-category')" required>
-          <option value="expense">הוצאה קבועה</option>
-          <option value="income">הכנסה קבועה</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>סכום (₪)</label>
-        <input type="number" id="rec-amount" step="0.01" placeholder="0.00" required>
-      </div>
-      <div class="form-group">
-        <label>קטגוריה</label>
-        <select id="rec-category" required></select>
-      </div>
-      <div class="form-group">
-        <label>שם הפריט הקבוע</label>
-        <input type="text" id="rec-description" placeholder="למשל: שכירות" required>
-      </div>
-      <button type="submit" class="btn-submit">הוסף לרשימת הקבועים</button>
-    </form>
+    <div class="form-group">
+      <label>סכום (₪)</label>
+      <input type="number" id="amountInput" placeholder="0">
+    </div>
+    <button class="submit-btn" id="addBtn">הוסף תנועה</button>
+  </div>
 
-    <div class="section-title">רשימת הקבועים שלך</div>
-    <div id="recurring-list" class="transactions-list"></div>
+  <div class="card">
+    <h3 style="margin-top:0; margin-bottom:12px; font-size:16px;">פירוט תנועות</h3>
+    <ul class="item-list" id="itemList"></ul>
   </div>
 </div>
 
-<script>
-  const defaultRecurringItems = [
-    { id: 1, type: 'income', amount: 8300, category: 'משכורת / פרילנס', icon: '💰', description: 'משכורת צבא' },
-    { id: 2, type: 'income', amount: 2000, category: 'מכירות / עסק', icon: '📈', description: 'עצמאי' },
-    { id: 3, type: 'income', amount: 5000, category: 'משכורת / פרילנס', icon: '💰', description: 'משכורת גולדי' },
-    { id: 4, type: 'income', amount: 1500, category: 'מכירות / עסק', icon: '📈', description: 'בונוס ניהול חנות' },
-    { id: 5, type: 'income', amount: 276, category: 'החזר / מתנה', icon: '🎁', description: 'ביטוח לאומי' },
-    { id: 6, type: 'expense', amount: 6353, category: 'חשבונות ובית', icon: '🏠', description: 'שכ"ד/משכנתה' },
-    { id: 7, type: 'expense', amount: 120, category: 'חשבונות ובית', icon: '🏠', description: 'חשמל' },
-    { id: 8, type: 'expense', amount: 50, category: 'חשבונות ובית', icon: '🏠', description: 'גז' },
-    { id: 9, type: 'expense', amount: 760, category: 'רכב ותחבורה', icon: '🚗', description: 'תשלומי רכב' },
-    { id: 10, type: 'expense', amount: 250, category: 'רכב ותחבורה', icon: '🚗', description: 'הוצאות רכב בליי' },
-    { id: 11, type: 'expense', amount: 600, category: 'חשבונות ובית', icon: '🏠', description: 'הלוואות מזרחי דירה' },
-    { id: 12, type: 'expense', amount: 100, category: 'שונות', icon: '📦', description: 'צדקה אהבת חסד' },
-    { id: 13, type: 'expense', amount: 150, category: 'שונות', icon: '📦', description: 'צדקה בית כנסת' },
-    { id: 14, type: 'expense', amount: 350, category: 'רכב ותחבורה', icon: '🚗', description: 'ביטוח רכב' },
-    { id: 15, type: 'expense', amount: 300, category: 'בריאות', icon: '💊', description: 'ביטוחים' },
-    { id: 16, type: 'expense', amount: 245, category: 'חשבונות ובית', icon: '🏠', description: 'וועד בית' },
-    { id: 17, type: 'expense', amount: 180, category: 'שונות', icon: '📦', description: 'חוג לפערי' },
-    { id: 18, type: 'expense', amount: 180, category: 'חשבונות ובית', icon: '🏠', description: 'טלפון ותקשורת' },
-    { id: 19, type: 'expense', amount: 1000, category: 'רכב ותחבורה', icon: '🚗', description: 'דלק' },
-    { id: 20, type: 'expense', amount: 200, category: 'חשבונות ובית', icon: '🏠', description: 'ארנונה בהנחה' },
-    { id: 21, type: 'expense', amount: 150, category: 'חשבונות ובית', icon: '🏠', description: 'מים' },
-    { id: 22, type: 'expense', amount: 1500, category: 'שונות', icon: '📦', description: 'גן' },
-    { id: 23, type: 'expense', amount: 600, category: 'שונות', icon: '📦', description: 'חסכונות ילדים' },
-    { id: 24, type: 'expense', amount: 180, category: 'ציוד ועסק', icon: '💻', description: 'הנהלת חשבונות' }
-  ];
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const categoriesConfig = {
-    expense: [
-      { name: 'חשבונות ובית', icon: '🏠' },
-      { name: 'רכב ותחבורה', icon: '🚗' },
-      { name: 'סופר ומזון', icon: '🛒' },
-      { name: 'מסעדות וקפה', icon: '🍔' },
-      { name: 'ציוד ועסק', icon: '💻' },
-      { name: 'קניות וביגוד', icon: '🛍️' },
-      { name: 'בריאות', icon: '💊' },
-      { name: 'שונות', icon: '📦' }
-    ],
-    income: [
-      { name: 'משכורת / פרילנס', icon: '💰' },
-      { name: 'מכירות / עסק', icon: '📈' },
-      { name: 'החזר / מתנה', icon: '🎁' },
-      { name: 'שונות', icon: '💵' }
-    ]
+  const firebaseConfig = {
+    apiKey: "AIzaSyDL-TvU-NDdt_mIR0R0nG85IeA2q7tHID0",
+    authDomain: "mi-budget-5dd37.firebaseapp.com",
+    projectId: "mi-budget-5dd37",
+    storageBucket: "mi-budget-5dd37.firebasestorage.app",
+    messagingSenderId: "740618672548",
+    appId: "1:740618672548:web:3d5c91490d0e9525c00931",
+    measurementId: "G-JH6GCNNFRW"
   };
 
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let currentType = 'expense';
   let currentDate = new Date();
-  let transactions = JSON.parse(localStorage.getItem('transactions_v5')) || [];
-  let recurringItems = JSON.parse(localStorage.getItem('recurring_items_v5')) || defaultRecurringItems;
-  let loadedMonths = JSON.parse(localStorage.getItem('loaded_months')) || [];
-  let activeTab = null; // 'income' או 'expense' או null
-  let myChart = null;
+  let transactions = [];
 
-  function updateCategories(typeElementId, categoryElementId) {
-    const type = document.getElementById(typeElementId).value;
-    const catSelect = document.getElementById(categoryElementId);
-    catSelect.innerHTML = '';
-    categoriesConfig[type].forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c.name;
-      opt.innerText = `${c.icon} ${c.name}`;
-      catSelect.appendChild(opt);
-    });
-  }
+  const monthNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
 
-  function changeMonth(delta) {
-    currentDate.setMonth(currentDate.getMonth() + delta);
-    autoLoadRecurring();
+  function updateMonthLabel() {
+    document.getElementById('currentMonthLabel').innerText = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
     render();
   }
 
-  function autoLoadRecurring() {
-    const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
-    if (!loadedMonths.includes(monthKey)) {
-      const year = currentDate.getFullYear();
-      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-      const dateStr = `${year}-${month}-01`;
-
-      recurringItems.forEach(rec => {
-        transactions.unshift({
-          id: Date.now() + Math.random(),
-          type: rec.type,
-          amount: rec.amount,
-          category: rec.category,
-          icon: rec.icon,
-          description: rec.description,
-          date: dateStr
-        });
-      });
-
-      loadedMonths.push(monthKey);
-      localStorage.setItem('loaded_months', JSON.stringify(loadedMonths));
-      localStorage.setItem('transactions_v5', JSON.stringify(transactions));
-    }
-  }
-
-  function toggleDrawer(type) {
-    const drawer = document.getElementById('drawer-container');
-    const incomeCard = document.getElementById('income-card');
-    const expenseCard = document.getElementById('expense-card');
-    const incomeArrow = document.getElementById('income-arrow');
-    const expenseArrow = document.getElementById('expense-arrow');
-
-    if (activeTab === type) {
-      activeTab = null;
-      drawer.style.display = 'none';
-      incomeCard.classList.remove('active');
-      expenseCard.classList.remove('active');
-      incomeArrow.innerText = '▼';
-      expenseArrow.innerText = '▼';
-    } else {
-      activeTab = type;
-      drawer.style.display = 'block';
-      
-      incomeCard.classList.toggle('active', type === 'income');
-      expenseCard.classList.toggle('active', type === 'expense');
-      
-      incomeArrow.innerText = type === 'income' ? '▲' : '▼';
-      expenseArrow.innerText = type === 'expense' ? '▲' : '▼';
-
-      renderDrawerContent();
-    }
-  }
-
-  function renderDrawerContent() {
-    if (!activeTab) return;
-
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const drawerTitle = document.getElementById('drawer-title');
-    const drawerList = document.getElementById('drawer-list');
-
-    drawerTitle.innerText = activeTab === 'income' ? 'פירוט הכנסות החודש' : 'פירוט הוצאות החודש';
-    drawerList.innerHTML = '';
-
-    const filtered = transactions.filter(t => {
-      const d = new Date(t.date);
-      return d.getFullYear() === year && d.getMonth() === month && t.type === activeTab;
-    });
-
-    if (filtered.length === 0) {
-      drawerList.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 15px;">אין ${activeTab === 'income' ? 'הכנסות' : 'הוצאות'} בחודש זה</div>`;
-      return;
-    }
-
-    filtered.forEach(t => {
-      const item = document.createElement('div');
-      item.className = 'transaction-item';
-      item.innerHTML = `
-        <div class="t-left">
-          <div class="t-icon">${t.icon || '📌'}</div>
-          <div class="t-info">
-            <span class="t-title">${t.description || t.category}</span>
-            <span class="t-meta">${t.category} • ${t.date}</span>
-          </div>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span class="t-amount ${t.type}">
-            ${t.type === 'income' ? '+' : '-'}₪${t.amount.toLocaleString()}
-          </span>
-          <button class="delete-btn" onclick="deleteTransaction(${t.id})">✕</button>
-        </div>
-      `;
-      drawerList.appendChild(item);
-    });
-  }
-
-  function openModal() {
-    document.getElementById('date').valueAsDate = new Date();
-    updateCategories('type', 'category');
-    document.getElementById('modal-overlay').style.display = 'flex';
-  }
-  function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
-
-  function openRecurringModal() {
-    updateCategories('rec-type', 'rec-category');
-    renderRecurringList();
-    document.getElementById('recurring-modal-overlay').style.display = 'flex';
-  }
-  function closeRecurringModal() { document.getElementById('recurring-modal-overlay').style.display = 'none'; }
-
-  document.getElementById('transaction-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const type = document.getElementById('type').value;
-    const catName = document.getElementById('category').value;
-    const catObj = categoriesConfig[type].find(c => c.name === catName);
-
-    const transaction = {
-      id: Date.now(),
-      type: type,
-      amount: parseFloat(document.getElementById('amount').value),
-      category: catName,
-      icon: catObj ? catObj.icon : '📌',
-      description: document.getElementById('description').value,
-      date: document.getElementById('date').value
-    };
-
-    transactions.unshift(transaction);
-    localStorage.setItem('transactions_v5', JSON.stringify(transactions));
-    render();
-    closeModal();
-    document.getElementById('amount').value = '';
-    document.getElementById('description').value = '';
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    updateMonthLabel();
   });
 
-  document.getElementById('recurring-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const type = document.getElementById('rec-type').value;
-    const catName = document.getElementById('rec-category').value;
-    const catObj = categoriesConfig[type].find(c => c.name === catName);
-
-    const item = {
-      id: Date.now(),
-      type: type,
-      amount: parseFloat(document.getElementById('rec-amount').value),
-      category: catName,
-      icon: catObj ? catObj.icon : '📌',
-      description: document.getElementById('rec-description').value
-    };
-
-    recurringItems.push(item);
-    localStorage.setItem('recurring_items_v5', JSON.stringify(recurringItems));
-    renderRecurringList();
-    document.getElementById('rec-amount').value = '';
-    document.getElementById('rec-description').value = '';
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    updateMonthLabel();
   });
 
-  function deleteRecurring(id) {
-    recurringItems = recurringItems.filter(i => i.id !== id);
-    localStorage.setItem('recurring_items_v5', JSON.stringify(recurringItems));
-    renderRecurringList();
-  }
+  document.getElementById('typeExpense').addEventListener('click', () => {
+    currentType = 'expense';
+    document.getElementById('typeExpense').className = 'type-btn active expense';
+    document.getElementById('typeIncome').className = 'type-btn income';
+  });
 
-  function renderRecurringList() {
-    const list = document.getElementById('recurring-list');
-    list.innerHTML = '';
-    recurringItems.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'transaction-item';
-      div.innerHTML = `
-        <div class="t-left">
-          <div class="t-icon">${item.icon}</div>
-          <div class="t-info">
-            <span class="t-title">${item.description}</span>
-            <span class="t-meta">${item.category}</span>
-          </div>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span class="t-amount ${item.type}">
-            ${item.type === 'income' ? '+' : '-'}₪${item.amount.toLocaleString()}
-          </span>
-          <button class="delete-btn" onclick="deleteRecurring(${item.id})">✕</button>
-        </div>
-      `;
-      list.appendChild(div);
+  document.getElementById('typeIncome').addEventListener('click', () => {
+    currentType = 'income';
+    document.getElementById('typeIncome').className = 'type-btn active income';
+    document.getElementById('typeExpense').className = 'type-btn expense';
+  });
+
+  document.getElementById('addBtn').addEventListener('click', async () => {
+    const desc = document.getElementById('descInput').value.trim();
+    const amount = parseFloat(document.getElementById('amountInput').value);
+
+    if (!desc || isNaN(amount) || amount <= 0) return;
+
+    await addDoc(collection(db, "transactions"), {
+      desc,
+      amount,
+      type: currentType,
+      date: new Date().toISOString(),
+      month: currentDate.getMonth(),
+      year: currentDate.getFullYear()
     });
-  }
 
-  function deleteTransaction(id) {
-    transactions = transactions.filter(t => t.id !== id);
-    localStorage.setItem('transactions_v5', JSON.stringify(transactions));
+    document.getElementById('descInput').value = '';
+    document.getElementById('amountInput').value = '';
+  });
+
+  window.deleteItem = async (id) => {
+    await deleteDoc(doc(db, "transactions", id));
+  };
+
+  onSnapshot(collection(db, "transactions"), (snapshot) => {
+    transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     render();
-  }
-
-  function renderChart(expenseData) {
-    const ctx = document.getElementById('expenseChart').getContext('2d');
-    const chartBox = document.getElementById('chart-box');
-
-    const labels = Object.keys(expenseData);
-    const data = Object.values(expenseData);
-
-    if (labels.length === 0) {
-      chartBox.style.display = 'none';
-      return;
-    }
-
-    chartBox.style.display = 'block';
-    if (myChart) myChart.destroy();
-
-    myChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#6366f1']
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
-      }
-    });
-  }
+  });
 
   function render() {
-    const monthNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-
-    document.getElementById('month-display').innerText = `${monthNames[month]} ${year}`;
-
-    let incomeSum = 0;
-    let expenseSum = 0;
-    const expenseByCat = {};
-
-    const filtered = transactions.filter(t => {
-      const d = new Date(t.date);
-      return d.getFullYear() === year && d.getMonth() === month;
-    });
+    const filtered = transactions.filter(t => t.month === currentDate.getMonth() && t.year === currentDate.getFullYear());
+    
+    let inc = 0, exp = 0;
+    const listEl = document.getElementById('itemList');
+    listEl.innerHTML = '';
 
     filtered.forEach(t => {
-      if (t.type === 'income') {
-        incomeSum += t.amount;
-      } else {
-        expenseSum += t.amount;
-        expenseByCat[t.category] = (expenseByCat[t.category] || 0) + t.amount;
-      }
+      if (t.type === 'income') inc += t.amount;
+      else exp += t.amount;
+
+      const li = document.createElement('li');
+      li.className = 'item-row';
+      li.innerHTML = `
+        <div class="item-info">
+          <span class="item-title">${t.desc}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="item-amount ${t.type}">${t.type === 'income' ? '+' : '-'}₪${t.amount.toLocaleString()}</span>
+          <button class="delete-btn" onclick="deleteItem('${t.id}')">✕</button>
+        </div>
+      `;
+      listEl.appendChild(li);
     });
 
-    document.getElementById('total-income').innerText = `₪${incomeSum.toLocaleString()}`;
-    document.getElementById('total-expense').innerText = `₪${expenseSum.toLocaleString()}`;
-    
-    const net = incomeSum - expenseSum;
-    document.getElementById('net-balance').innerText = `₪${net.toLocaleString()}`;
-
-    renderChart(expenseByCat);
-    if (activeTab) renderDrawerContent();
+    document.getElementById('totalIncome').innerText = `₪${inc.toLocaleString()}`;
+    document.getElementById('totalExpense').innerText = `₪${exp.toLocaleString()}`;
+    const bal = inc - exp;
+    document.getElementById('totalBalance').innerText = `${bal < 0 ? '-' : ''}₪${Math.abs(bal).toLocaleString()}`;
   }
 
-  autoLoadRecurring();
-  render();
+  updateMonthLabel();
 </script>
 </body>
 </html>
