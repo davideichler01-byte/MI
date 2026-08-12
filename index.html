@@ -61,7 +61,15 @@
                     </div>
                     <div class="flex-1">
                         <label class="block text-xs text-gray-500 mb-1">קטגוריה</label>
-                        <input type="text" id="tx-category" placeholder="כללי" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500">
+                        <select id="tx-category" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500 bg-white">
+                            <option value="דיור">דיור</option>
+                            <option value="רכב ודלק">רכב ודלק</option>
+                            <option value="ביטוחים">ביטוחים</option>
+                            <option value="ילדים וחינוך">ילדים וחינוך</option>
+                            <option value="צדקה">צדקה</option>
+                            <option value="הכנסות עבודה">הכנסות עבודה</option>
+                            <option value="אחר">אחר</option>
+                        </select>
                     </div>
                 </div>
                 <button type="submit" class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold text-sm hover:bg-gray-800 transition">הוסף תנועה</button>
@@ -159,16 +167,16 @@
             e.preventDefault();
             const desc = document.getElementById('tx-desc').value;
             const amount = document.getElementById('tx-amount').value;
+            const category = document.getElementById('tx-category').value;
             
             if (currentFormType === 'expense') {
-                expensesData.push({ name: desc, amount: amount + " ₪" });
+                expensesData.push({ name: `${desc} (${category})`, amount: amount + " ₪" });
             } else {
-                incomeData.push({ name: desc, amount: amount + " ₪" });
+                incomeData.push({ name: `${desc} (${category})`, amount: amount + " ₪" });
             }
             alert("התנועה נוספה בהצלחה!");
             document.getElementById('tx-desc').value = '';
             document.getElementById('tx-amount').value = '';
-            document.getElementById('tx-category').value = '';
         }
 
         const ctx = document.getElementById('expenseChart').getContext('2d');
