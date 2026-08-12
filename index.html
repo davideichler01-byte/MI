@@ -1,248 +1,288 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ניהול תקציב אישי</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --primary: #4f46e5;
-      --income: #10b981;
-      --income-bg: #ecfdf5;
-      --expense: #ef4444;
-      --expense-bg: #fef2f2;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --radius: 16px;
-    }
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body {
-      background-color: var(--bg);
-      color: var(--text-main);
-      margin: 0; padding: 16px;
-      display: flex; justify-content: center;
-    }
-    .app-container { width: 100%; max-width: 600px; padding-bottom: 80px; }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    header h1 { font-size: 20px; font-weight: 700; margin: 0; }
-    .month-picker {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--surface); padding: 6px 12px;
-      border-radius: 20px; border: 1px solid var(--border);
-    }
-    .month-btn { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--primary); font-weight: bold; }
-    .month-label { font-size: 14px; font-weight: 600; color: var(--text-main); min-width: 90px; text-align: center; }
-    .card {
-      background: var(--surface); border-radius: var(--radius);
-      padding: 16px; margin-bottom: 16px;
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .balance-title { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
-    .balance-amount { font-size: 32px; font-weight: 800; }
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-    .stat-box { padding: 12px; border-radius: 12px; }
-    .stat-box.income { background: var(--income-bg); color: var(--income); }
-    .stat-box.expense { background: var(--expense-bg); color: var(--expense); }
-    .stat-label { font-size: 12px; margin-bottom: 2px; opacity: 0.9; }
-    .stat-value { font-size: 18px; font-weight: 700; }
-    .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted); }
-    input, select {
-      width: 100%; padding: 10px 12px; border-radius: 8px;
-      border: 1px solid var(--border); font-size: 15px; outline: none;
-    }
-    .type-selector { display: flex; gap: 8px; margin-bottom: 12px; }
-    .type-btn {
-      flex: 1; padding: 10px; border: 1px solid var(--border);
-      border-radius: 8px; background: var(--surface);
-      font-weight: 600; cursor: pointer; text-align: center;
-    }
-    .type-btn.active.income { background: var(--income-bg); border-color: var(--income); color: var(--income); }
-    .type-btn.active.expense { background: var(--expense-bg); border-color: var(--expense); color: var(--expense); }
-    .submit-btn {
-      width: 100%; padding: 12px; background: var(--primary);
-      color: white; border: none; border-radius: 8px;
-      font-size: 16px; font-weight: 600; cursor: pointer;
-    }
-    .item-list { list-style: none; padding: 0; margin: 0; }
-    .item-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 0; border-bottom: 1px solid var(--border);
-    }
-    .item-info { display: flex; flex-direction: column; }
-    .item-title { font-weight: 600; font-size: 15px; }
-    .item-date { font-size: 12px; color: var(--text-muted); }
-    .item-amount { font-weight: 700; font-size: 15px; }
-    .item-amount.income { color: var(--income); }
-    .item-amount.expense { color: var(--expense); }
-    .delete-btn { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px 8px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- תגיות למניעת שמירת גירסה ישנה בזיכרון המטמון -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>תקציב אישי</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
+        body { font-family: 'Assistant', sans-serif; background-color: #f4f6f9; }
+    </style>
 </head>
-<body>
+<body class="p-4 md:p-8 max-w-2xl mx-auto">
 
-<div class="app-container">
-  <header>
-    <h1>תקציב אישי</h1>
-    <div class="month-picker">
-      <button class="month-btn" id="prevMonth">&gt;</button>
-      <span class="month-label" id="currentMonthLabel"></span>
-      <button class="month-btn" id="nextMonth">&lt;</button>
+    <!-- כותרת ובחירת חודש -->
+    <div class="flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm">
+        <button onclick="changeMonth(-1)" class="text-indigo-600 hover:bg-indigo-50 p-2 rounded-lg font-bold text-lg">&gt;</button>
+        <h1 id="currentMonthYear" class="text-xl font-bold text-gray-800"></h1>
+        <button onclick="changeMonth(1)" class="text-indigo-600 hover:bg-indigo-50 p-2 rounded-lg font-bold text-lg">&lt;</button>
     </div>
-  </header>
 
-  <div class="card">
-    <div class="balance-title">מאזן חודשי</div>
-    <div class="balance-amount" id="totalBalance">₪0</div>
-    <div class="stats-grid">
-      <div class="stat-box income">
-        <div class="stat-label">הכנסות</div>
-        <div class="stat-value" id="totalIncome">₪0</div>
-      </div>
-      <div class="stat-box expense">
-        <div class="stat-label">הוצאות</div>
-        <div class="stat-value" id="totalExpense">₪0</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3 style="margin-top:0; margin-bottom:12px; font-size:16px;">הוספת תנועה</h3>
-    <div class="type-selector">
-      <div class="type-btn active expense" id="typeExpense">הוצאה</div>
-      <div class="type-btn income" id="typeIncome">הכנסה</div>
-    </div>
-    <div class="form-group">
-      <label>תיאור</label>
-      <input type="text" id="descInput" placeholder="לדוגמה: סופרמרקט">
-    </div>
-    <div class="form-group">
-      <label>סכום (₪)</label>
-      <input type="number" id="amountInput" placeholder="0">
-    </div>
-    <button class="submit-btn" id="addBtn">הוסף תנועה</button>
-  </div>
-
-  <div class="card">
-    <h3 style="margin-top:0; margin-bottom:12px; font-size:16px;">פירוט תנועות</h3>
-    <ul class="item-list" id="itemList"></ul>
-  </div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDL-TvU-NDdt_mIR0R0nG85IeA2q7tHID0",
-    authDomain: "mi-budget-5dd37.firebaseapp.com",
-    projectId: "mi-budget-5dd37",
-    storageBucket: "mi-budget-5dd37.firebasestorage.app",
-    messagingSenderId: "740618672548",
-    appId: "1:740618672548:web:3d5c91490d0e9525c00931",
-    measurementId: "G-JH6GCNNFRW"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  let currentType = 'expense';
-  let currentDate = new Date();
-  let transactions = [];
-
-  const monthNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
-
-  function updateMonthLabel() {
-    document.getElementById('currentMonthLabel').innerText = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-    render();
-  }
-
-  document.getElementById('prevMonth').addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    updateMonthLabel();
-  });
-
-  document.getElementById('nextMonth').addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    updateMonthLabel();
-  });
-
-  document.getElementById('typeExpense').addEventListener('click', () => {
-    currentType = 'expense';
-    document.getElementById('typeExpense').className = 'type-btn active expense';
-    document.getElementById('typeIncome').className = 'type-btn income';
-  });
-
-  document.getElementById('typeIncome').addEventListener('click', () => {
-    currentType = 'income';
-    document.getElementById('typeIncome').className = 'type-btn active income';
-    document.getElementById('typeExpense').className = 'type-btn expense';
-  });
-
-  document.getElementById('addBtn').addEventListener('click', async () => {
-    const desc = document.getElementById('descInput').value.trim();
-    const amount = parseFloat(document.getElementById('amountInput').value);
-
-    if (!desc || isNaN(amount) || amount <= 0) return;
-
-    await addDoc(collection(db, "transactions"), {
-      desc,
-      amount,
-      type: currentType,
-      date: new Date().toISOString(),
-      month: currentDate.getMonth(),
-      year: currentDate.getFullYear()
-    });
-
-    document.getElementById('descInput').value = '';
-    document.getElementById('amountInput').value = '';
-  });
-
-  window.deleteItem = async (id) => {
-    await deleteDoc(doc(db, "transactions", id));
-  };
-
-  onSnapshot(collection(db, "transactions"), (snapshot) => {
-    transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    render();
-  });
-
-  function render() {
-    const filtered = transactions.filter(t => t.month === currentDate.getMonth() && t.year === currentDate.getFullYear());
-    
-    let inc = 0, exp = 0;
-    const listEl = document.getElementById('itemList');
-    listEl.innerHTML = '';
-
-    filtered.forEach(t => {
-      if (t.type === 'income') inc += t.amount;
-      else exp += t.amount;
-
-      const li = document.createElement('li');
-      li.className = 'item-row';
-      li.innerHTML = `
-        <div class="item-info">
-          <span class="item-title">${t.desc}</span>
+    <!-- כרטיסיית סיכום ומאזן -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-gray-100">
+        <div class="text-center mb-4">
+            <span class="text-gray-500 text-sm font-semibold">מאזן חודשי</span>
+            <div id="totalBalance" class="text-3xl font-extrabold text-gray-800 mt-1">0 ₪</div>
         </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span class="item-amount ${t.type}">${t.type === 'income' ? '+' : '-'}₪${t.amount.toLocaleString()}</span>
-          <button class="delete-btn" onclick="deleteItem('${t.id}')">✕</button>
+        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+            <div class="bg-emerald-50 p-3 rounded-xl text-center">
+                <span class="text-emerald-600 text-xs font-bold block">הכנסות</span>
+                <span id="totalIncome" class="text-emerald-700 font-bold text-lg">0 ₪</span>
+            </div>
+            <div class="bg-rose-50 p-3 rounded-xl text-center">
+                <span class="text-rose-600 text-xs font-bold block">הוצאות</span>
+                <span id="totalExpense" class="text-rose-700 font-bold text-lg">0 ₪</span>
+            </div>
         </div>
-      `;
-      listEl.appendChild(li);
-    });
+    </div>
 
-    document.getElementById('totalIncome').innerText = `₪${inc.toLocaleString()}`;
-    document.getElementById('totalExpense').innerText = `₪${exp.toLocaleString()}`;
-    const bal = inc - exp;
-    document.getElementById('totalBalance').innerText = `${bal < 0 ? '-' : ''}₪${Math.abs(bal).toLocaleString()}`;
-  }
+    <!-- גרף התפלגות הוצאות -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-gray-100">
+        <h2 class="text-lg font-bold text-gray-800 mb-4 text-center">התפלגות הוצאות</h2>
+        <div class="w-48 h-48 mx-auto">
+            <canvas id="expenseChart"></canvas>
+        </div>
+    </div>
 
-  updateMonthLabel();
-</script>
+    <!-- טופס הוספת תנועה -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-gray-100">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">הוספת תנועה</h2>
+        <form id="transactionForm" onsubmit="addTransaction(event)" class="space-y-4">
+            <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
+                <button type="button" id="btnExpense" onclick="setType('expense')" class="py-2 rounded-lg font-bold text-sm bg-rose-500 text-white shadow-sm transition">הוצאה</button>
+                <button type="button" id="btnIncome" onclick="setType('income')" class="py-2 rounded-lg font-bold text-sm text-gray-600 transition">הכנסה</button>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">תיאור</label>
+                <input type="text" id="descInput" required placeholder="לדוגמה: סופרמרקט" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">סכום (₪)</label>
+                    <input type="number" step="any" id="amountInput" required placeholder="0" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">קטגוריה</label>
+                    <select id="categoryInput" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                        <option value="כללי">כללי</option>
+                        <option value="מזון וקניות">מזון וקניות</option>
+                        <option value="חשבונות ודיור">חשבונות ודיור</option>
+                        <option value="תחבורה">תחבורה</option>
+                        <option value="פנאי ובילויים">פנאי ובילויים</option>
+                        <option value="משכורת">משכורת</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white font-bold p-3 rounded-xl hover:bg-indigo-700 transition">הוסף תנועה</button>
+        </form>
+    </div>
+
+    <!-- רשימת תנועות מתקפלת -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+        <button onclick="toggleList()" class="w-full p-4 flex justify-between items-center bg-white hover:bg-gray-50 transition">
+            <span class="font-bold text-gray-800">פירוט תנועות החודש</span>
+            <i id="listChevron" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+        </button>
+        <div id="transactionsListContainer" class="hidden border-t border-gray-100 p-4">
+            <div id="transactionsList" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDL-TvU-NDdt_mIR0R0nG85IeA2q7tHID0",
+            authDomain: "mi-budget-5dd37.firebaseapp.com",
+            projectId: "mi-budget-5dd37",
+            storageBucket: "mi-budget-5dd37.firebasestorage.app",
+            messagingSenderId: "740618672548",
+            appId: "1:740618672548:web:3d5c91490d0e9525c00931",
+            measurementId: "G-JH6GCNNFRW"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentType = 'expense';
+        let currentDate = new Date();
+        let myChart = null;
+
+        function setType(type) {
+            currentType = type;
+            const btnExpense = document.getElementById('btnExpense');
+            const btnIncome = document.getElementById('btnIncome');
+            if (type === 'expense') {
+                btnExpense.className = "py-2 rounded-lg font-bold text-sm bg-rose-500 text-white shadow-sm transition";
+                btnIncome.className = "py-2 rounded-lg font-bold text-sm text-gray-600 transition";
+            } else {
+                btnIncome.className = "py-2 rounded-lg font-bold text-sm bg-emerald-500 text-white shadow-sm transition";
+                btnExpense.className = "py-2 rounded-lg font-bold text-sm text-gray-600 transition";
+            }
+        }
+
+        function toggleList() {
+            const container = document.getElementById('transactionsListContainer');
+            const chevron = document.getElementById('listChevron');
+            container.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        }
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            loadData();
+        }
+
+        function addTransaction(e) {
+            e.preventDefault();
+            const desc = document.getElementById('descInput').value;
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            const category = document.getElementById('categoryInput').value;
+
+            db.collection('transactions').add({
+                desc,
+                amount,
+                category,
+                type: currentType,
+                date: firebase.firestore.Timestamp.fromDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), new Date().getDate()))
+            }).then(() => {
+                document.getElementById('transactionForm').reset();
+                setType('expense');
+            });
+        }
+
+        function deleteTransaction(id) {
+            db.collection('transactions').doc(id).delete();
+        }
+
+        function loadData() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            const monthNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
+            document.getElementById('currentMonthYear').innerText = `${monthNames[month]} ${year}`;
+
+            const startOfMonth = new Date(year, month, 1);
+            const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
+
+            db.collection('transactions')
+                .where('date', '>=', firebase.firestore.Timestamp.fromDate(startOfMonth))
+                .where('date', '<=', firebase.firestore.Timestamp.fromDate(endOfMonth))
+                .onSnapshot(snapshot => {
+                    let income = 0;
+                    let expense = 0;
+                    const listEl = document.getElementById('transactionsList');
+                    listEl.innerHTML = '';
+                    const categoryTotals = {};
+
+                    if (snapshot.empty) {
+                        listEl.innerHTML = '<div class="text-center text-gray-400 py-4 text-sm">אין תנועות בחודש זה</div>';
+                    }
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const id = doc.id;
+
+                        if (data.type === 'income') {
+                            income += data.amount;
+                        } else {
+                            expense += data.amount;
+                            categoryTotals[data.category] = (categoryTotals[data.category] || 0) + data.amount;
+                        }
+
+                        const item = document.createElement('div');
+                        item.className = "flex justify-between items-center p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition";
+                        item.innerHTML = `
+                            <div class="flex items-center space-x-3 space-x-reverse">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center ${data.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}">
+                                    <i class="fa-solid ${data.type === 'income' ? 'fa-arrow-down' : 'fa-arrow-up'} text-xs"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-gray-800 text-sm">${data.desc}</div>
+                                    <div class="text-xs text-gray-400">${data.category}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 space-x-reverse">
+                                <span class="font-bold ${data.type === 'income' ? 'text-emerald-600' : 'text-rose-600'} text-sm">
+                                    ${data.type === 'income' ? '+' : '-'}${data.amount} ₪
+                                </span>
+                                <button onclick="deleteTransaction('${id}')" class="text-gray-300 hover:text-rose-500 text-xs">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                        listEl.appendChild(item);
+                    });
+
+                    document.getElementById('totalIncome').innerText = `${income} ₪`;
+                    document.getElementById('totalExpense').innerText = `${expense} ₪`;
+                    document.getElementById('totalBalance').innerText = `${income - expense} ₪`;
+
+                    updateChart(categoryTotals);
+                });
+        }
+
+        function updateChart(categoryTotals) {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            const labels = Object.keys(categoryTotals);
+            const data = Object.values(categoryTotals);
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            if (data.length === 0) {
+                myChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['אין הוצאות'],
+                        datasets: [{
+                            data: [1],
+                            backgroundColor: ['#e5e7eb']
+                        }]
+                    },
+                    options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
+                });
+                return;
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'
+                        ]
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Assistant' } } }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        loadData();
+    </script>
 </body>
 </html>
