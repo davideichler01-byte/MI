@@ -65,7 +65,7 @@
                     </div>
                     <div class="flex-1">
                         <label class="block text-xs text-gray-500 mb-1">קטגוריה</label>
-                        <select id="tx-category" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500 bg-white">
+                        <select id="tx-category" onchange="handleCategoryChange()" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500 bg-white">
                             <option value="דיור">דיור</option>
                             <option value="רכב ודלק">רכב ודלק</option>
                             <option value="ביטוחים">ביטוחים</option>
@@ -75,6 +75,11 @@
                             <option value="אחר">אחר</option>
                         </select>
                     </div>
+                </div>
+                <!-- שדה שם קטגוריה חדש שמופיע רק כשבוחרים "אחר" -->
+                <div id="custom-category-wrapper" style="display: none;">
+                    <label class="block text-xs text-gray-500 mb-1">שם קטגוריה ידני</label>
+                    <input type="text" id="tx-custom-category" placeholder="הקלד שם קטגוריה חדש" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500">
                 </div>
                 <button type="submit" class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold text-sm hover:bg-gray-800 transition">הוסף תנועה</button>
             </form>
@@ -97,34 +102,45 @@
             }
         }
 
+        function handleCategoryChange() {
+            const catSelect = document.getElementById('tx-category');
+            const customWrapper = document.getElementById('custom-category-wrapper');
+            if (catSelect.value === 'אחר') {
+                customWrapper.style.display = 'block';
+            } else {
+                customWrapper.style.display = 'none';
+                document.getElementById('tx-custom-category').value = '';
+            }
+        }
+
         let expensesData = [
-            { name: "שכ\"ד/משכנתא", rawAmount: 6353, amount: "6,353.00 ₪" },
-            { name: "חשמל", rawAmount: 120, amount: "120.00 ₪" },
-            { name: "גז", rawAmount: 50, amount: "50.00 ₪" },
-            { name: "תשלומי רכב", rawAmount: 760, amount: "760.00 ₪" },
-            { name: "הוצאות רכב בליי", rawAmount: 250, amount: "250.00 ₪" },
-            { name: "הלוואות מזרחי דירה", rawAmount: 600, amount: "600.00 ₪" },
-            { name: "צדקה אהבת חסד", rawAmount: 100, amount: "100.00 ₪" },
-            { name: "צדקה בית כנסת", rawAmount: 150, amount: "150.00 ₪" },
-            { name: "ביטוח רכב", rawAmount: 350, amount: "350.00 ₪" },
-            { name: "ביטוחים", rawAmount: 300, amount: "300.00 ₪" },
-            { name: "ועד בית", rawAmount: 245, amount: "245.00 ₪" },
-            { name: "חוג לפערי", rawAmount: 180, amount: "180.00 ₪" },
-            { name: "טלפון ותקשורת", rawAmount: 180, amount: "180.00 ₪" },
-            { name: "דלק", rawAmount: 1000, amount: "1,000.00 ₪" },
-            { name: "ארמונה בהנחה", rawAmount: 200, amount: "200.00 ₪" },
-            { name: "מים", rawAmount: 150, amount: "150.00 ₪" },
-            { name: "גן", rawAmount: 1500, amount: "1,500.00 ₪" },
-            { name: "חסכונות ילדים", rawAmount: 600, amount: "600.00 ₪" },
-            { name: "הנהלת חשבונות", rawAmount: 180, amount: "180.00 ₪" }
+            { id: 1, name: "שכ\"ד/משכנתא", rawAmount: 6353, amount: "6,353.00 ₪", isCustom: false },
+            { id: 2, name: "חשמל", rawAmount: 120, amount: "120.00 ₪", isCustom: false },
+            { id: 3, name: "גז", rawAmount: 50, amount: "50.00 ₪", isCustom: false },
+            { id: 4, name: "תשלומי רכב", rawAmount: 760, amount: "760.00 ₪", isCustom: false },
+            { id: 5, name: "הוצאות רכב בליי", rawAmount: 250, amount: "250.00 ₪", isCustom: false },
+            { id: 6, name: "הלוואות מזרחי דירה", rawAmount: 600, amount: "600.00 ₪", isCustom: false },
+            { id: 7, name: "צדקה אהבת חסד", rawAmount: 100, amount: "100.00 ₪", isCustom: false },
+            { id: 8, name: "צדקה בית כנסת", rawAmount: 150, amount: "150.00 ₪", isCustom: false },
+            { id: 9, name: "ביטוח רכב", rawAmount: 350, amount: "350.00 ₪", isCustom: false },
+            { id: 10, name: "ביטוחים", rawAmount: 300, amount: "300.00 ₪", isCustom: false },
+            { id: 11, name: "ועד בית", rawAmount: 245, amount: "245.00 ₪", isCustom: false },
+            { id: 12, name: "חוג לפערי", rawAmount: 180, amount: "180.00 ₪", isCustom: false },
+            { id: 13, name: "טלפון ותקשורת", rawAmount: 180, amount: "180.00 ₪", isCustom: false },
+            { id: 14, name: "דלק", rawAmount: 1000, amount: "1,000.00 ₪", isCustom: false },
+            { id: 15, name: "ארמונה בהנחה", rawAmount: 200, amount: "200.00 ₪", isCustom: false },
+            { id: 16, name: "מים", rawAmount: 150, amount: "150.00 ₪", isCustom: false },
+            { id: 17, name: "גן", rawAmount: 1500, amount: "1,500.00 ₪", isCustom: false },
+            { id: 18, name: "חסכונות ילדים", rawAmount: 600, amount: "600.00 ₪", isCustom: false },
+            { id: 19, name: "הנהלת חשבונות", rawAmount: 180, amount: "180.00 ₪", isCustom: false }
         ];
 
         let incomeData = [
-            { name: "משכורת צבא", rawAmount: 8300, amount: "8,300.00 ₪" },
-            { name: "עצמאי", rawAmount: 2000, amount: "2,000.00 ₪" },
-            { name: "משכורת גולדי", rawAmount: 5000, amount: "5,000.00 ₪" },
-            { name: "בונוס ניהול חנות", rawAmount: 1500, amount: "1,500.00 ₪" },
-            { name: "ביטוח לאומי", rawAmount: 276, amount: "276.00 ₪" }
+            { id: 101, name: "משכורת צבא", rawAmount: 8300, amount: "8,300.00 ₪", isCustom: false },
+            { id: 102, name: "עצמאי", rawAmount: 2000, amount: "2,000.00 ₪", isCustom: false },
+            { id: 103, name: "משכורת גולדי", rawAmount: 5000, amount: "5,000.00 ₪", isCustom: false },
+            { id: 104, name: "בונוס ניהול חנות", rawAmount: 1500, amount: "1,500.00 ₪", isCustom: false },
+            { id: 105, name: "ביטוח לאומי", rawAmount: 276, amount: "276.00 ₪", isCustom: false }
         ];
 
         let activeSectionType = null;
@@ -159,13 +175,19 @@
             activeSectionType = type;
             list.innerHTML = '';
             
-            if (type === 'expenses') {
-                title.innerText = "פירוט הוצאות";
-                expensesData.forEach(i => list.innerHTML += `<li class="flex justify-between py-2 text-pink-600"><span>${i.name}</span><span class="font-semibold">${i.amount}</span></li>`);
-            } else {
-                title.innerText = "פירוט הכנסות";
-                incomeData.forEach(i => list.innerHTML += `<li class="flex justify-between py-2 text-green-600"><span>${i.name}</span><span class="font-semibold">${i.amount}</span></li>`);
-            }
+            const dataArray = (type === 'expenses') ? expensesData : incomeData;
+            const colorClass = (type === 'expenses') ? 'text-pink-600' : 'text-green-600';
+
+            title.innerText = (type === 'expenses') ? "פירוט הוצאות" : "פירוט הכנסות";
+            
+            dataArray.forEach(item => {
+                let deleteBtnHtml = item.isCustom ? `<button onclick="deleteItem('${type}', ${item.id})" class="text-red-500 hover:text-red-700 text-xs font-bold mr-3 bg-red-50 px-2 py-1 rounded">מחק</button>` : '';
+                list.innerHTML += `<li class="flex justify-between items-center py-2">
+                    <div><span class="text-gray-700">${item.name}</span></div>
+                    <div class="flex items-center"><span class="font-semibold ${colorClass}">${item.amount}</span>${deleteBtnHtml}</div>
+                </li>`;
+            });
+
             section.style.display = 'block';
         }
 
@@ -174,25 +196,52 @@
             activeSectionType = null;
         }
 
+        function deleteItem(type, id) {
+            if (type === 'expenses') {
+                expensesData = expensesData.filter(i => i.id !== id);
+            } else {
+                incomeData = incomeData.filter(i => i.id !== id);
+            }
+            updateTotals();
+        }
+
         function addTransaction(e) {
             e.preventDefault();
             const desc = document.getElementById('tx-desc').value;
             const amountVal = parseFloat(document.getElementById('tx-amount').value);
-            const category = document.getElementById('tx-category').value;
+            let category = document.getElementById('tx-category').value;
             
+            if (category === 'אחר') {
+                const customCat = document.getElementById('tx-custom-category').value.trim();
+                if (customCat) {
+                    category = customCat;
+                }
+            }
+
             const formattedAmount = amountVal.toLocaleString() + ".00 ₪";
             const fullName = `${desc} (${category})`;
+            const newItem = {
+                id: Date.now(),
+                name: fullName,
+                rawAmount: amountVal,
+                amount: formattedAmount,
+                isCustom: true // מסומן כמותאם אישית כך שניתן יהיה למחוק אותו
+            };
 
             if (currentFormType === 'expense') {
-                expensesData.push({ name: fullName, rawAmount: amountVal, amount: formattedAmount });
+                expensesData.push(newItem);
             } else {
-                incomeData.push({ name: fullName, rawAmount: amountVal, amount: formattedAmount });
+                incomeData.push(newItem);
             }
 
             updateTotals();
             alert("התנועה נוספה בהצלחה!");
+            
             document.getElementById('tx-desc').value = '';
             document.getElementById('tx-amount').value = '';
+            document.getElementById('tx-custom-category').value = '';
+            document.getElementById('tx-category').value = 'דיור';
+            document.getElementById('custom-category-wrapper').style.display = 'none';
         }
 
         updateTotals();
