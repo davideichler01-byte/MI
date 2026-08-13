@@ -17,16 +17,16 @@
         <!-- מאזן חודשי -->
         <div class="bg-white p-6 rounded-2xl shadow-sm text-center">
             <h1 class="text-gray-500 mb-1 text-sm font-medium">מאזן חודשי</h1>
-            <div id="net-balance" class="text-3xl font-bold text-green-600 mb-4">+0 ₪</div>
+            <div id="net-balance" class="text-3xl font-bold text-green-600 mb-4">+3,238 ₪</div>
             
             <div class="flex gap-4">
                 <div onclick="toggleSection('expenses')" class="flex-1 bg-pink-50 p-4 rounded-xl cursor-pointer hover:bg-pink-100 transition">
                     <p class="text-pink-600 text-sm">הוצאות</p>
-                    <p id="total-expenses" class="font-bold text-xl text-pink-700">0 ₪</p>
+                    <p id="total-expenses" class="font-bold text-xl text-pink-700">13,838 ₪</p>
                 </div>
                 <div onclick="toggleSection('income')" class="flex-1 bg-green-50 p-4 rounded-xl cursor-pointer hover:bg-green-100 transition">
                     <p class="text-green-600 text-sm">הכנסות</p>
-                    <p id="total-income" class="font-bold text-xl text-green-700">0 ₪</p>
+                    <p id="total-income" class="font-bold text-xl text-green-700">17,076 ₪</p>
                 </div>
             </div>
         </div>
@@ -76,7 +76,7 @@
                         </select>
                     </div>
                 </div>
-                <!-- שדה שם קטגוריה ידני שמופיע רק כשבוחרים "אחר" -->
+                <!-- שדה שם קטגוריה חדש שמופיע רק כשבוחרים "אחר" -->
                 <div id="custom-category-wrapper" style="display: none;">
                     <label class="block text-xs text-gray-500 mb-1">שם קטגוריה ידני</label>
                     <input type="text" id="tx-custom-category" placeholder="הקלד שם קטגוריה חדש" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500">
@@ -107,31 +107,10 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        // הגדרות ה-Firebase שלך (השתמש בנתונים הקיימים שלך בפרויקט)
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
+    <script>
         let currentFormType = 'expense';
-        let expensesData = [];
-        let incomeData = [];
-        let activeSectionType = null;
 
-        window.setFormType = function(type) {
+        function setFormType(type) {
             currentFormType = type;
             const expBtn = document.getElementById('type-expense');
             const incBtn = document.getElementById('type-income');
@@ -142,9 +121,9 @@
                 incBtn.className = "flex-1 py-2 rounded-xl font-bold bg-green-500 text-white transition";
                 expBtn.className = "flex-1 py-2 rounded-xl font-bold bg-gray-100 text-gray-600 transition";
             }
-        };
+        }
 
-        window.handleCategoryChange = function() {
+        function handleCategoryChange() {
             const catSelect = document.getElementById('tx-category');
             const customWrapper = document.getElementById('custom-category-wrapper');
             if (catSelect.value === 'אחר') {
@@ -153,57 +132,41 @@
                 customWrapper.style.display = 'none';
                 document.getElementById('tx-custom-category').value = '';
             }
-        };
-
-        function saveData() {
-            set(ref(db, 'budget_data'), {
-                expenses: expensesData,
-                income: incomeData
-            });
         }
 
-        // האזנה לשינויים בזמן אמת מכל מכשיר
-        onValue(ref(db, 'budget_data'), (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                expensesData = data.expenses || [];
-                incomeData = data.income || [];
-            } else {
-                // נתוני ברירת מחדל אם מסד הנתונים ריק
-                expensesData = [
-                    { id: 1, name: "שכ\"ד/משכנתא", rawAmount: 6353, amount: "6,353.00 ₪" },
-                    { id: 2, name: "חשמל", rawAmount: 120, amount: "120.00 ₪" },
-                    { id: 3, name: "גז", rawAmount: 50, amount: "50.00 ₪" },
-                    { id: 4, name: "תשלומי רכב", rawAmount: 760, amount: "760.00 ₪" },
-                    { id: 5, name: "הוצאות רכב בליי", rawAmount: 250, amount: "250.00 ₪" },
-                    { id: 6, name: "הלוואות מזרחי דירה", rawAmount: 600, amount: "600.00 ₪" },
-                    { id: 7, name: "צדקה אהבת חסד", rawAmount: 100, amount: "100.00 ₪" },
-                    { id: 8, name: "צדקה בית כנסת", rawAmount: 150, amount: "150.00 ₪" },
-                    { id: 9, name: "ביטוח רכב", rawAmount: 350, amount: "350.00 ₪" },
-                    { id: 10, name: "ביטוחים", rawAmount: 300, amount: "300.00 ₪" },
-                    { id: 11, name: "ועד בית", rawAmount: 245, amount: "245.00 ₪" },
-                    { id: 12, name: "חוג לפערי", rawAmount: 180, amount: "180.00 ₪" },
-                    { id: 13, name: "טלפון ותקשורת", rawAmount: 180, amount: "180.00 ₪" },
-                    { id: 14, name: "דלק", rawAmount: 1000, amount: "1,000.00 ₪" },
-                    { id: 15, name: "ארמונה בהנחה", rawAmount: 200, amount: "200.00 ₪" },
-                    { id: 16, name: "מים", rawAmount: 150, amount: "150.00 ₪" },
-                    { id: 17, name: "גן", rawAmount: 1500, amount: "1,500.00 ₪" },
-                    { id: 18, name: "חסכונות ילדים", rawAmount: 600, amount: "600.00 ₪" },
-                    { id: 19, name: "הנהלת חשבונות", rawAmount: 180, amount: "180.00 ₪" }
-                ];
-                incomeData = [
-                    { id: 101, name: "משכורת צבא", rawAmount: 8300, amount: "8,300.00 ₪" },
-                    { id: 102, name: "עצמאי", rawAmount: 2000, amount: "2,000.00 ₪" },
-                    { id: 103, name: "משכורת גולדי", rawAmount: 5000, amount: "5,000.00 ₪" },
-                    { id: 104, name: "בונוס ניהול חנות", rawAmount: 1500, amount: "1,500.00 ₪" },
-                    { id: 105, name: "ביטוח לאומי", rawAmount: 276, amount: "276.00 ₪" }
-                ];
-                saveData();
-            }
-            updateUI();
-        });
+        let expensesData = [
+            { id: 1, name: "שכ\"ד/משכנתא", rawAmount: 6353, amount: "6,353.00 ₪" },
+            { id: 2, name: "חשמל", rawAmount: 120, amount: "120.00 ₪" },
+            { id: 3, name: "גז", rawAmount: 50, amount: "50.00 ₪" },
+            { id: 4, name: "תשלומי רכב", rawAmount: 760, amount: "760.00 ₪" },
+            { id: 5, name: "הוצאות רכב בליי", rawAmount: 250, amount: "250.00 ₪" },
+            { id: 6, name: "הלוואות מזרחי דירה", rawAmount: 600, amount: "600.00 ₪" },
+            { id: 7, name: "צדקה אהבת חסד", rawAmount: 100, amount: "100.00 ₪" },
+            { id: 8, name: "צדקה בית כנסת", rawAmount: 150, amount: "150.00 ₪" },
+            { id: 9, name: "ביטוח רכב", rawAmount: 350, amount: "350.00 ₪" },
+            { id: 10, name: "ביטוחים", rawAmount: 300, amount: "300.00 ₪" },
+            { id: 11, name: "ועד בית", rawAmount: 245, amount: "245.00 ₪" },
+            { id: 12, name: "חוג לפערי", rawAmount: 180, amount: "180.00 ₪" },
+            { id: 13, name: "טלפון ותקשורת", rawAmount: 180, amount: "180.00 ₪" },
+            { id: 14, name: "דלק", rawAmount: 1000, amount: "1,000.00 ₪" },
+            { id: 15, name: "ארמונה בהנחה", rawAmount: 200, amount: "200.00 ₪" },
+            { id: 16, name: "מים", rawAmount: 150, amount: "150.00 ₪" },
+            { id: 17, name: "גן", rawAmount: 1500, amount: "1,500.00 ₪" },
+            { id: 18, name: "חסכונות ילדים", rawAmount: 600, amount: "600.00 ₪" },
+            { id: 19, name: "הנהלת חשבונות", rawAmount: 180, amount: "180.00 ₪" }
+        ];
 
-        function updateUI() {
+        let incomeData = [
+            { id: 101, name: "משכורת צבא", rawAmount: 8300, amount: "8,300.00 ₪" },
+            { id: 102, name: "עצמאי", rawAmount: 2000, amount: "2,000.00 ₪" },
+            { id: 103, name: "משכורת גולדי", rawAmount: 5000, amount: "5,000.00 ₪" },
+            { id: 104, name: "בונוס ניהול חנות", rawAmount: 1500, amount: "1,500.00 ₪" },
+            { id: 105, name: "ביטוח לאומי", rawAmount: 276, amount: "276.00 ₪" }
+        ];
+
+        let activeSectionType = null;
+
+        function updateTotals() {
             let totalExp = expensesData.reduce((sum, item) => sum + item.rawAmount, 0);
             let totalInc = incomeData.reduce((sum, item) => sum + item.rawAmount, 0);
             let net = totalInc - totalExp;
@@ -216,17 +179,17 @@
             netEl.className = `text-3xl font-bold mb-4 ${net >= 0 ? 'text-green-600' : 'text-pink-600'}`;
 
             if (activeSectionType) {
-                window.toggleSection(activeSectionType, true);
+                toggleSection(activeSectionType, true);
             }
         }
 
-        window.toggleSection = function(type, keepOpen = false) {
+        function toggleSection(type, keepOpen = false) {
             const section = document.getElementById('details-section');
             const list = document.getElementById('details-list');
             const title = document.getElementById('section-title');
             
             if (!keepOpen && activeSectionType === type && section.style.display === 'block') {
-                window.hideSection();
+                hideSection();
                 return;
             }
 
@@ -250,23 +213,23 @@
             });
 
             section.style.display = 'block';
-        };
+        }
 
-        window.hideSection = function() { 
+        function hideSection() { 
             document.getElementById('details-section').style.display = 'none'; 
             activeSectionType = null;
-        };
+        }
 
-        window.deleteItem = function(type, id) {
+        function deleteItem(type, id) {
             if (type === 'expenses') {
                 expensesData = expensesData.filter(i => i.id !== id);
             } else {
                 incomeData = incomeData.filter(i => i.id !== id);
             }
-            saveData();
-        };
+            updateTotals();
+        }
 
-        window.openEditModal = function(type, id) {
+        function openEditModal(type, id) {
             const dataArray = (type === 'expenses') ? expensesData : incomeData;
             const item = dataArray.find(i => i.id === id);
             if (!item) return;
@@ -277,13 +240,13 @@
             document.getElementById('edit-amount').value = item.rawAmount;
 
             document.getElementById('edit-modal').style.display = 'flex';
-        };
+        }
 
-        window.closeEditModal = function() {
+        function closeEditModal() {
             document.getElementById('edit-modal').style.display = 'none';
-        };
+        }
 
-        window.saveEdit = function() {
+        function saveEdit() {
             const type = document.getElementById('edit-type').value;
             const id = Number(document.getElementById('edit-id').value);
             const newName = document.getElementById('edit-name').value;
@@ -298,11 +261,11 @@
                 item.amount = newAmount.toLocaleString() + ".00 ₪";
             }
 
-            window.closeEditModal();
-            saveData();
-        };
+            closeEditModal();
+            updateTotals();
+        }
 
-        window.addTransaction = function(e) {
+        function addTransaction(e) {
             e.preventDefault();
             const desc = document.getElementById('tx-desc').value;
             const amountVal = parseFloat(document.getElementById('tx-amount').value);
@@ -330,16 +293,17 @@
                 incomeData.push(newItem);
             }
 
-            saveData();
+            updateTotals();
             
             document.getElementById('tx-desc').value = '';
             document.getElementById('tx-amount').value = '';
             document.getElementById('tx-custom-category').value = '';
             document.getElementById('tx-category').value = 'דיור';
             document.getElementById('custom-category-wrapper').style.display = 'none';
-        };
+        }
 
-        // תרשים
+        updateTotals();
+
         const ctx = document.getElementById('expenseChart').getContext('2d');
         new Chart(ctx, {
             type: 'doughnut',
