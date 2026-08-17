@@ -8,314 +8,598 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .hidden-section { display: none; }
+        body { min-height: 100vh; }
     </style>
 </head>
+
 <body class="bg-gray-100 p-4 font-sans pb-12">
 
-    <div class="max-w-md mx-auto space-y-4">
-        
-        <!-- מאזן חודשי -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm text-center">
-            <h1 class="text-gray-500 mb-1 text-sm font-medium">מאזן חודשי</h1>
-            <div id="net-balance" class="text-3xl font-bold text-green-600 mb-4">+3,238 ₪</div>
-            
-            <div class="flex gap-4">
-                <div onclick="toggleSection('expenses')" class="flex-1 bg-pink-50 p-4 rounded-xl cursor-pointer hover:bg-pink-100 transition">
-                    <p class="text-pink-600 text-sm">הוצאות</p>
-                    <p id="total-expenses" class="font-bold text-xl text-pink-700">13,838 ₪</p>
-                </div>
-                <div onclick="toggleSection('income')" class="flex-1 bg-green-50 p-4 rounded-xl cursor-pointer hover:bg-green-100 transition">
-                    <p class="text-green-600 text-sm">הכנסות</p>
-                    <p id="total-income" class="font-bold text-xl text-green-700">17,076 ₪</p>
-                </div>
-            </div>
-        </div>
+<div class="max-w-md mx-auto space-y-4">
 
-        <!-- אזור הפירוט (נסתר כברירת מחדל) -->
-        <div id="details-section" class="bg-white p-6 rounded-2xl shadow-sm hidden-section">
-            <div class="flex justify-between items-center mb-4">
-                <h2 id="section-title" class="text-lg font-bold text-gray-800">פירוט</h2>
-                <button onclick="hideSection()" class="text-gray-400 hover:text-gray-600 font-bold">סגור X</button>
-            </div>
-            <ul id="details-list" class="space-y-3 text-sm divide-y divide-gray-100 max-h-60 overflow-y-auto"></ul>
-        </div>
+    <!-- מאזן חודשי -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm text-center">
+        <h1 class="text-gray-500 mb-1 text-sm font-medium">מאזן חודשי</h1>
+        <div id="net-balance" class="text-3xl font-bold text-green-600 mb-4">+0 ₪</div>
 
-        <!-- תרשים -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm">
-            <h2 class="text-center font-bold text-gray-700 mb-4">התפלגות הוצאות</h2>
-            <div class="relative w-48 h-48 mx-auto"><canvas id="expenseChart"></canvas></div>
-        </div>
-
-        <!-- טופס הוספה -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm">
-            <h2 class="font-bold text-gray-800 mb-4">הוספת תנועה חדשה</h2>
-            <div class="flex gap-2 mb-4">
-                <button type="button" id="type-expense" onclick="setFormType('expense')" class="flex-1 py-2 rounded-xl font-bold bg-pink-500 text-white transition">הוצאה</button>
-                <button type="button" id="type-income" onclick="setFormType('income')" class="flex-1 py-2 rounded-xl font-bold bg-gray-100 text-gray-600 transition">הכנסה</button>
+        <div class="flex gap-4">
+            <div onclick="toggleSection('expenses')"
+                 class="flex-1 bg-pink-50 p-4 rounded-xl cursor-pointer hover:bg-pink-100 transition">
+                <p class="text-pink-600 text-sm">הוצאות</p>
+                <p id="total-expenses" class="font-bold text-xl text-pink-700">0 ₪</p>
             </div>
-            <form onsubmit="addTransaction(event)" class="space-y-3">
-                <div>
-                    <label class="block text-xs text-gray-500 mb-1">תיאור</label>
-                    <input type="text" id="tx-desc" placeholder="לדוגמה: סופרמרקט" required class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500">
-                </div>
-                <div class="flex gap-2">
-                    <div class="flex-1">
-                        <label class="block text-xs text-gray-500 mb-1">סכום (₪)</label>
-                        <input type="number" id="tx-amount" placeholder="0" required class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500">
-                    </div>
-                    <div class="flex-1">
-                        <label class="block text-xs text-gray-500 mb-1">קטגוריה</label>
-                        <select id="tx-category" onchange="handleCategoryChange()" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500 bg-white">
-                            <option value="דיור">דיור</option>
-                            <option value="רכב ודלק">רכב ודלק</option>
-                            <option value="ביטוחים">ביטוחים</option>
-                            <option value="ילדים וחינוך">ילדים וחינוך</option>
-                            <option value="צדקה">צדקה</option>
-                            <option value="הכנסות עבודה">הכנסות עבודה</option>
-                            <option value="אחר">אחר</option>
-                        </select>
-                    </div>
-                </div>
-                <!-- שדה שם קטגוריה חדש שמופיע רק כשבוחרים "אחר" -->
-                <div id="custom-category-wrapper" style="display: none;">
-                    <label class="block text-xs text-gray-500 mb-1">שם קטגוריה ידני</label>
-                    <input type="text" id="tx-custom-category" placeholder="הקלד שם קטגוריה חדש" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500">
-                </div>
-                <button type="submit" class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold text-sm hover:bg-gray-800 transition">הוסף תנועה</button>
-            </form>
+
+            <div onclick="toggleSection('income')"
+                 class="flex-1 bg-green-50 p-4 rounded-xl cursor-pointer hover:bg-green-100 transition">
+                <p class="text-green-600 text-sm">הכנסות</p>
+                <p id="total-income" class="font-bold text-xl text-green-700">0 ₪</p>
+            </div>
         </div>
     </div>
 
-    <!-- מודל לעריכת פריט -->
-    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style="display: none;">
+    <!-- פירוט -->
+    <div id="details-section" class="bg-white p-6 rounded-2xl shadow-sm hidden-section">
+        <div class="flex justify-between items-center mb-4">
+            <h2 id="section-title" class="text-lg font-bold text-gray-800">פירוט</h2>
+            <button onclick="hideSection()" class="text-gray-400 hover:text-gray-600 font-bold">
+                סגור X
+            </button>
+        </div>
+        <ul id="details-list"
+            class="space-y-3 text-sm divide-y divide-gray-100 max-h-80 overflow-y-auto"></ul>
+    </div>
+
+    <!-- תרשים -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm">
+        <h2 class="text-center font-bold text-gray-700 mb-4">התפלגות הוצאות</h2>
+        <div class="relative w-48 h-48 mx-auto">
+            <canvas id="expenseChart"></canvas>
+        </div>
+        <p id="chart-empty" class="text-center text-gray-400 text-sm mt-3 hidden">
+            אין עדיין הוצאות להצגה
+        </p>
+    </div>
+
+    <!-- טופס הוספה -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm">
+        <h2 class="font-bold text-gray-800 mb-4">הוספת תנועה חדשה</h2>
+
+        <div class="flex gap-2 mb-4">
+            <button type="button" id="type-expense"
+                    onclick="setFormType('expense')"
+                    class="flex-1 py-2 rounded-xl font-bold bg-pink-500 text-white transition">
+                הוצאה
+            </button>
+
+            <button type="button" id="type-income"
+                    onclick="setFormType('income')"
+                    class="flex-1 py-2 rounded-xl font-bold bg-gray-100 text-gray-600 transition">
+                הכנסה
+            </button>
+        </div>
+
+        <form id="transaction-form" class="space-y-3">
+            <div>
+                <label class="block text-xs text-gray-500 mb-1">תיאור</label>
+                <input type="text" id="tx-desc" placeholder="לדוגמה: סופרמרקט"
+                       required
+                       class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500">
+            </div>
+
+            <div class="flex gap-2">
+                <div class="flex-1">
+                    <label class="block text-xs text-gray-500 mb-1">סכום (₪)</label>
+                    <input type="number" id="tx-amount" placeholder="0"
+                           min="0.01" step="0.01" required
+                           class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500">
+                </div>
+
+                <div class="flex-1">
+                    <label class="block text-xs text-gray-500 mb-1">קטגוריה</label>
+                    <select id="tx-category"
+                            onchange="handleCategoryChange()"
+                            class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500 bg-white">
+                        <option value="דיור">דיור</option>
+                        <option value="רכב ודלק">רכב ודלק</option>
+                        <option value="ביטוחים">ביטוחים</option>
+                        <option value="ילדים וחינוך">ילדים וחינוך</option>
+                        <option value="צדקה">צדקה</option>
+                        <option value="מזון">מזון</option>
+                        <option value="בילויים">בילויים</option>
+                        <option value="הכנסות עבודה">הכנסות עבודה</option>
+                        <option value="אחר">אחר</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="custom-category-wrapper" style="display:none;">
+                <label class="block text-xs text-gray-500 mb-1">שם קטגוריה ידני</label>
+                <input type="text" id="tx-custom-category"
+                       placeholder="הקלד שם קטגוריה חדש"
+                       class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-blue-500">
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold text-sm hover:bg-gray-800 transition">
+                הוסף תנועה
+            </button>
+        </form>
+
+        <div id="save-status" class="text-center text-xs text-green-600 mt-3">
+            הנתונים נשמרים אוטומטית במכשיר
+        </div>
+    </div>
+
+    <!-- חלון עריכה -->
+    <div id="edit-modal"
+         class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4"
+         style="display:none;">
         <div class="bg-white p-6 rounded-2xl w-full max-w-sm space-y-4">
             <h2 class="font-bold text-lg text-gray-800">עריכת פריט</h2>
+
             <input type="hidden" id="edit-type">
             <input type="hidden" id="edit-id">
+
             <div>
                 <label class="block text-xs text-gray-500 mb-1">שם הפריט</label>
-                <input type="text" id="edit-name" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none">
+                <input type="text" id="edit-name"
+                       class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none">
             </div>
+
             <div>
                 <label class="block text-xs text-gray-500 mb-1">סכום (₪)</label>
-                <input type="number" id="edit-amount" class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none">
+                <input type="number" id="edit-amount" min="0.01" step="0.01"
+                       class="w-full border border-gray-200 rounded-xl p-2.5 text-sm outline-none">
             </div>
+
             <div class="flex gap-2 pt-2">
-                <button onclick="saveEdit()" class="flex-1 bg-green-600 text-white py-2.5 rounded-xl font-bold text-sm">שמור</button>
-                <button onclick="closeEditModal()" class="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-xl font-bold text-sm">ביטול</button>
+                <button onclick="saveEdit()"
+                        class="flex-1 bg-green-600 text-white py-2.5 rounded-xl font-bold text-sm">
+                    שמור
+                </button>
+                <button onclick="closeEditModal()"
+                        class="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-xl font-bold text-sm">
+                    ביטול
+                </button>
             </div>
         </div>
     </div>
 
-    <script>
-        let currentFormType = 'expense';
+</div>
 
-        function setFormType(type) {
-            currentFormType = type;
-            const expBtn = document.getElementById('type-expense');
-            const incBtn = document.getElementById('type-income');
-            if (type === 'expense') {
-                expBtn.className = "flex-1 py-2 rounded-xl font-bold bg-pink-500 text-white transition";
-                incBtn.className = "flex-1 py-2 rounded-xl font-bold bg-gray-100 text-gray-600 transition";
+<script>
+    // =========================================================
+    // שמירה מקומית - מתאים ל-GitHub Pages בלי Firebase
+    // =========================================================
+
+    const STORAGE_KEY = "davidi_budget_data_v2";
+
+    let currentFormType = "expense";
+    let expensesData = [];
+    let incomeData = [];
+    let activeSectionType = null;
+    let expenseChart = null;
+
+    const defaultExpenses = [
+        { id: 1, name: 'שכ"ד/משכנתא', rawAmount: 6353 },
+        { id: 2, name: "חשמל", rawAmount: 120 },
+        { id: 3, name: "גז", rawAmount: 50 },
+        { id: 4, name: "תשלומי רכב", rawAmount: 760 },
+        { id: 5, name: "הוצאות רכב", rawAmount: 250 },
+        { id: 6, name: "הלוואות מזרחי דירה", rawAmount: 600 },
+        { id: 7, name: "צדקה אהבת חסד", rawAmount: 100 },
+        { id: 8, name: "צדקה בית כנסת", rawAmount: 150 },
+        { id: 9, name: "ביטוח רכב", rawAmount: 350 },
+        { id: 10, name: "ביטוחים", rawAmount: 300 },
+        { id: 11, name: "ועד בית", rawAmount: 245 },
+        { id: 12, name: "חוג לילדים", rawAmount: 180 },
+        { id: 13, name: "טלפון ותקשורת", rawAmount: 180 },
+        { id: 14, name: "דלק", rawAmount: 1000 },
+        { id: 15, name: "ארוחה בהנחה", rawAmount: 200 },
+        { id: 16, name: "מים", rawAmount: 150 },
+        { id: 17, name: "גן", rawAmount: 1500 },
+        { id: 18, name: "חסכונות ילדים", rawAmount: 600 },
+        { id: 19, name: "הנהלת חשבונות", rawAmount: 180 }
+    ];
+
+    const defaultIncome = [
+        { id: 101, name: "משכורת צבא", rawAmount: 8300 },
+        { id: 102, name: "עצמאי", rawAmount: 2000 },
+        { id: 103, name: "משכורת גולדי", rawAmount: 5000 },
+        { id: 104, name: "בונוס ניהול חנות", rawAmount: 1500 },
+        { id: 105, name: "ביטוח לאומי", rawAmount: 276 }
+    ];
+
+    function formatMoney(amount) {
+        return Number(amount || 0).toLocaleString("he-IL", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }) + " ₪";
+    }
+
+    function saveData() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                expenses: expensesData,
+                income: incomeData,
+                savedAt: new Date().toISOString()
+            }));
+
+            showSaveStatus("נשמר בהצלחה ✓", true);
+        } catch (error) {
+            console.error("שגיאה בשמירה:", error);
+            showSaveStatus("לא ניתן לשמור את הנתונים בדפדפן", false);
+        }
+    }
+
+    function loadData() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+
+            if (saved) {
+                const data = JSON.parse(saved);
+
+                expensesData = Array.isArray(data.expenses) ? data.expenses : [];
+                incomeData = Array.isArray(data.income) ? data.income : [];
+
+                // תיקון נתונים ישנים אם צריך
+                normalizeData(expensesData);
+                normalizeData(incomeData);
             } else {
-                incBtn.className = "flex-1 py-2 rounded-xl font-bold bg-green-500 text-white transition";
-                expBtn.className = "flex-1 py-2 rounded-xl font-bold bg-gray-100 text-gray-600 transition";
+                // רק בפעם הראשונה נטען נתוני ברירת מחדל
+                expensesData = structuredClone(defaultExpenses);
+                incomeData = structuredClone(defaultIncome);
+                saveData();
             }
+        } catch (error) {
+            console.error("שגיאה בטעינת הנתונים:", error);
+            expensesData = structuredClone(defaultExpenses);
+            incomeData = structuredClone(defaultIncome);
         }
 
-        function handleCategoryChange() {
-            const catSelect = document.getElementById('tx-category');
-            const customWrapper = document.getElementById('custom-category-wrapper');
-            if (catSelect.value === 'אחר') {
-                customWrapper.style.display = 'block';
-            } else {
-                customWrapper.style.display = 'none';
-                document.getElementById('tx-custom-category').value = '';
-            }
+        updateUI();
+    }
+
+    function normalizeData(array) {
+        array.forEach(item => {
+            item.rawAmount = Number(item.rawAmount) || 0;
+        });
+    }
+
+    function showSaveStatus(message, success) {
+        const el = document.getElementById("save-status");
+        el.textContent = message;
+        el.className = "text-center text-xs mt-3 " +
+            (success ? "text-green-600" : "text-red-600");
+
+        clearTimeout(window.saveStatusTimer);
+        window.saveStatusTimer = setTimeout(() => {
+            el.textContent = "הנתונים נשמרים אוטומטית במכשיר";
+            el.className = "text-center text-xs text-green-600 mt-3";
+        }, 1800);
+    }
+
+    window.setFormType = function(type) {
+        currentFormType = type;
+
+        const expBtn = document.getElementById("type-expense");
+        const incBtn = document.getElementById("type-income");
+
+        if (type === "expense") {
+            expBtn.className = "flex-1 py-2 rounded-xl font-bold bg-pink-500 text-white transition";
+            incBtn.className = "flex-1 py-2 rounded-xl font-bold bg-gray-100 text-gray-600 transition";
+        } else {
+            incBtn.className = "flex-1 py-2 rounded-xl font-bold bg-green-500 text-white transition";
+            expBtn.className = "flex-1 py-2 rounded-xl font-bold bg-gray-100 text-gray-600 transition";
+        }
+    };
+
+    window.handleCategoryChange = function() {
+        const select = document.getElementById("tx-category");
+        const wrapper = document.getElementById("custom-category-wrapper");
+        const input = document.getElementById("tx-custom-category");
+
+        if (select.value === "אחר") {
+            wrapper.style.display = "block";
+            input.focus();
+        } else {
+            wrapper.style.display = "none";
+            input.value = "";
+        }
+    };
+
+    function updateUI() {
+        const totalExp = expensesData.reduce((sum, item) => sum + Number(item.rawAmount || 0), 0);
+        const totalInc = incomeData.reduce((sum, item) => sum + Number(item.rawAmount || 0), 0);
+        const net = totalInc - totalExp;
+
+        document.getElementById("total-expenses").textContent = formatMoney(totalExp);
+        document.getElementById("total-income").textContent = formatMoney(totalInc);
+
+        const netEl = document.getElementById("net-balance");
+        netEl.textContent = (net >= 0 ? "+" : "") + formatMoney(net);
+        netEl.className =
+            "text-3xl font-bold mb-4 " +
+            (net >= 0 ? "text-green-600" : "text-pink-600");
+
+        updateChart();
+
+        if (activeSectionType) {
+            toggleSection(activeSectionType, true);
+        }
+    }
+
+    window.toggleSection = function(type, keepOpen = false) {
+        const section = document.getElementById("details-section");
+        const list = document.getElementById("details-list");
+        const title = document.getElementById("section-title");
+
+        if (!keepOpen &&
+            activeSectionType === type &&
+            section.style.display === "block") {
+            hideSection();
+            return;
         }
 
-        let expensesData = [
-            { id: 1, name: "שכ\"ד/משכנתא", rawAmount: 6353, amount: "6,353.00 ₪" },
-            { id: 2, name: "חשמל", rawAmount: 120, amount: "120.00 ₪" },
-            { id: 3, name: "גז", rawAmount: 50, amount: "50.00 ₪" },
-            { id: 4, name: "תשלומי רכב", rawAmount: 760, amount: "760.00 ₪" },
-            { id: 5, name: "הוצאות רכב בליי", rawAmount: 250, amount: "250.00 ₪" },
-            { id: 6, name: "הלוואות מזרחי דירה", rawAmount: 600, amount: "600.00 ₪" },
-            { id: 7, name: "צדקה אהבת חסד", rawAmount: 100, amount: "100.00 ₪" },
-            { id: 8, name: "צדקה בית כנסת", rawAmount: 150, amount: "150.00 ₪" },
-            { id: 9, name: "ביטוח רכב", rawAmount: 350, amount: "350.00 ₪" },
-            { id: 10, name: "ביטוחים", rawAmount: 300, amount: "300.00 ₪" },
-            { id: 11, name: "ועד בית", rawAmount: 245, amount: "245.00 ₪" },
-            { id: 12, name: "חוג לפערי", rawAmount: 180, amount: "180.00 ₪" },
-            { id: 13, name: "טלפון ותקשורת", rawAmount: 180, amount: "180.00 ₪" },
-            { id: 14, name: "דלק", rawAmount: 1000, amount: "1,000.00 ₪" },
-            { id: 15, name: "ארמונה בהנחה", rawAmount: 200, amount: "200.00 ₪" },
-            { id: 16, name: "מים", rawAmount: 150, amount: "150.00 ₪" },
-            { id: 17, name: "גן", rawAmount: 1500, amount: "1,500.00 ₪" },
-            { id: 18, name: "חסכונות ילדים", rawAmount: 600, amount: "600.00 ₪" },
-            { id: 19, name: "הנהלת חשבונות", rawAmount: 180, amount: "180.00 ₪" }
-        ];
+        activeSectionType = type;
+        list.innerHTML = "";
 
-        let incomeData = [
-            { id: 101, name: "משכורת צבא", rawAmount: 8300, amount: "8,300.00 ₪" },
-            { id: 102, name: "עצמאי", rawAmount: 2000, amount: "2,000.00 ₪" },
-            { id: 103, name: "משכורת גולדי", rawAmount: 5000, amount: "5,000.00 ₪" },
-            { id: 104, name: "בונוס ניהול חנות", rawAmount: 1500, amount: "1,500.00 ₪" },
-            { id: 105, name: "ביטוח לאומי", rawAmount: 276, amount: "276.00 ₪" }
-        ];
+        const dataArray = type === "expenses" ? expensesData : incomeData;
+        const colorClass = type === "expenses" ? "text-pink-600" : "text-green-600";
 
-        let activeSectionType = null;
+        title.textContent = type === "expenses" ? "פירוט הוצאות" : "פירוט הכנסות";
 
-        function updateTotals() {
-            let totalExp = expensesData.reduce((sum, item) => sum + item.rawAmount, 0);
-            let totalInc = incomeData.reduce((sum, item) => sum + item.rawAmount, 0);
-            let net = totalInc - totalExp;
+        if (dataArray.length === 0) {
+            list.innerHTML =
+                '<li class="text-center text-gray-400 py-5">אין נתונים להצגה</li>';
+        } else {
+            dataArray.forEach(item => {
+                const li = document.createElement("li");
+                li.className = "flex justify-between items-center py-2 gap-2";
 
-            document.getElementById('total-expenses').innerText = totalExp.toLocaleString() + " ₪";
-            document.getElementById('total-income').innerText = totalInc.toLocaleString() + " ₪";
-            
-            const netEl = document.getElementById('net-balance');
-            netEl.innerText = (net >= 0 ? "+" : "") + net.toLocaleString() + " ₪";
-            netEl.className = `text-3xl font-bold mb-4 ${net >= 0 ? 'text-green-600' : 'text-pink-600'}`;
+                const name = document.createElement("span");
+                name.className = "text-gray-700 break-words";
+                name.textContent = item.name;
 
-            if (activeSectionType) {
-                toggleSection(activeSectionType, true);
-            }
+                const right = document.createElement("div");
+                right.className = "flex items-center gap-2 shrink-0";
+
+                const amount = document.createElement("span");
+                amount.className = "font-semibold " + colorClass;
+                amount.textContent = formatMoney(item.rawAmount);
+
+                const edit = document.createElement("button");
+                edit.className =
+                    "text-blue-500 hover:text-blue-700 text-xs font-bold bg-blue-50 px-2 py-1 rounded";
+                edit.textContent = "ערוך";
+                edit.onclick = () => openEditModal(type, item.id);
+
+                const del = document.createElement("button");
+                del.className =
+                    "text-red-500 hover:text-red-700 text-xs font-bold bg-red-50 px-2 py-1 rounded";
+                del.textContent = "מחק";
+                del.onclick = () => deleteItem(type, item.id);
+
+                right.appendChild(amount);
+                right.appendChild(edit);
+                right.appendChild(del);
+
+                li.appendChild(name);
+                li.appendChild(right);
+                list.appendChild(li);
+            });
         }
 
-        function toggleSection(type, keepOpen = false) {
-            const section = document.getElementById('details-section');
-            const list = document.getElementById('details-list');
-            const title = document.getElementById('section-title');
-            
-            if (!keepOpen && activeSectionType === type && section.style.display === 'block') {
-                hideSection();
+        section.style.display = "block";
+    };
+
+    window.hideSection = function() {
+        document.getElementById("details-section").style.display = "none";
+        activeSectionType = null;
+    };
+
+    window.deleteItem = function(type, id) {
+        const itemArray = type === "expenses" ? expensesData : incomeData;
+        const item = itemArray.find(i => Number(i.id) === Number(id));
+
+        if (!item) return;
+
+        const confirmed = confirm(
+            `למחוק את "${item.name}" בסך ${formatMoney(item.rawAmount)}?`
+        );
+
+        if (!confirmed) return;
+
+        if (type === "expenses") {
+            expensesData = expensesData.filter(i => Number(i.id) !== Number(id));
+        } else {
+            incomeData = incomeData.filter(i => Number(i.id) !== Number(id));
+        }
+
+        saveData();
+        updateUI();
+    };
+
+    window.openEditModal = function(type, id) {
+        const dataArray = type === "expenses" ? expensesData : incomeData;
+        const item = dataArray.find(i => Number(i.id) === Number(id));
+
+        if (!item) return;
+
+        document.getElementById("edit-type").value = type;
+        document.getElementById("edit-id").value = id;
+        document.getElementById("edit-name").value = item.name;
+        document.getElementById("edit-amount").value = item.rawAmount;
+
+        document.getElementById("edit-modal").style.display = "flex";
+    };
+
+    window.closeEditModal = function() {
+        document.getElementById("edit-modal").style.display = "none";
+    };
+
+    window.saveEdit = function() {
+        const type = document.getElementById("edit-type").value;
+        const id = Number(document.getElementById("edit-id").value);
+        const newName = document.getElementById("edit-name").value.trim();
+        const newAmount = Number(document.getElementById("edit-amount").value);
+
+        if (!newName) {
+            alert("נא להזין שם.");
+            return;
+        }
+
+        if (!Number.isFinite(newAmount) || newAmount <= 0) {
+            alert("נא להזין סכום תקין.");
+            return;
+        }
+
+        const dataArray = type === "expenses" ? expensesData : incomeData;
+        const item = dataArray.find(i => Number(i.id) === id);
+
+        if (!item) return;
+
+        item.name = newName;
+        item.rawAmount = newAmount;
+
+        closeEditModal();
+        saveData();
+        updateUI();
+    };
+
+    document.getElementById("transaction-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const desc = document.getElementById("tx-desc").value.trim();
+        const amountVal = Number(document.getElementById("tx-amount").value);
+        let category = document.getElementById("tx-category").value;
+
+        if (!desc) {
+            alert("נא להזין תיאור.");
+            return;
+        }
+
+        if (!Number.isFinite(amountVal) || amountVal <= 0) {
+            alert("נא להזין סכום תקין.");
+            return;
+        }
+
+        if (category === "אחר") {
+            const customCat =
+                document.getElementById("tx-custom-category").value.trim();
+
+            if (!customCat) {
+                alert("נא להזין שם לקטגוריה.");
                 return;
             }
 
-            activeSectionType = type;
-            list.innerHTML = '';
-            
-            const dataArray = (type === 'expenses') ? expensesData : incomeData;
-            const colorClass = (type === 'expenses') ? 'text-pink-600' : 'text-green-600';
-
-            title.innerText = (type === 'expenses') ? "פירוט הוצאות" : "פירוט הכנסות";
-            
-            dataArray.forEach(item => {
-                list.innerHTML += `<li class="flex justify-between items-center py-2">
-                    <div><span class="text-gray-700">${item.name}</span></div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-semibold ${colorClass}">${item.amount}</span>
-                        <button onclick="openEditModal('${type}', ${item.id})" class="text-blue-500 hover:text-blue-700 text-xs font-bold bg-blue-50 px-2 py-1 rounded">ערוך</button>
-                        <button onclick="deleteItem('${type}', ${item.id})" class="text-red-500 hover:text-red-700 text-xs font-bold bg-red-50 px-2 py-1 rounded">מחק</button>
-                    </div>
-                </li>`;
-            });
-
-            section.style.display = 'block';
+            category = customCat;
         }
 
-        function hideSection() { 
-            document.getElementById('details-section').style.display = 'none'; 
-            activeSectionType = null;
+        const newItem = {
+            id: Date.now(),
+            name: `${desc} (${category})`,
+            rawAmount: amountVal
+        };
+
+        if (currentFormType === "expense") {
+            expensesData.push(newItem);
+        } else {
+            incomeData.push(newItem);
         }
 
-        function deleteItem(type, id) {
-            if (type === 'expenses') {
-                expensesData = expensesData.filter(i => i.id !== id);
-            } else {
-                incomeData = incomeData.filter(i => i.id !== id);
-            }
-            updateTotals();
+        saveData();
+        updateUI();
+
+        document.getElementById("tx-desc").value = "";
+        document.getElementById("tx-amount").value = "";
+        document.getElementById("tx-custom-category").value = "";
+        document.getElementById("tx-category").value = "דיור";
+        document.getElementById("custom-category-wrapper").style.display = "none";
+
+        document.getElementById("tx-desc").focus();
+    });
+
+    function updateChart() {
+        const chartEmpty = document.getElementById("chart-empty");
+
+        // מזהה קטגוריות מתוך השם שנוצר בהוספה, ובמקביל מקבץ את הנתונים
+        const totals = {};
+
+        expensesData.forEach(item => {
+            const match = String(item.name).match(/\(([^()]*)\)$/);
+            const category = match ? match[1] : "אחר";
+            totals[category] = (totals[category] || 0) + Number(item.rawAmount || 0);
+        });
+
+        const labels = Object.keys(totals);
+        const values = Object.values(totals);
+
+        if (expenseChart) {
+            expenseChart.destroy();
+            expenseChart = null;
         }
 
-        function openEditModal(type, id) {
-            const dataArray = (type === 'expenses') ? expensesData : incomeData;
-            const item = dataArray.find(i => i.id === id);
-            if (!item) return;
-
-            document.getElementById('edit-type').value = type;
-            document.getElementById('edit-id').value = id;
-            document.getElementById('edit-name').value = item.name;
-            document.getElementById('edit-amount').value = item.rawAmount;
-
-            document.getElementById('edit-modal').style.display = 'flex';
+        if (labels.length === 0) {
+            chartEmpty.classList.remove("hidden");
+            return;
         }
 
-        function closeEditModal() {
-            document.getElementById('edit-modal').style.display = 'none';
-        }
+        chartEmpty.classList.add("hidden");
 
-        function saveEdit() {
-            const type = document.getElementById('edit-type').value;
-            const id = Number(document.getElementById('edit-id').value);
-            const newName = document.getElementById('edit-name').value;
-            const newAmount = parseFloat(document.getElementById('edit-amount').value);
+        const ctx = document.getElementById("expenseChart").getContext("2d");
 
-            const dataArray = (type === 'expenses') ? expensesData : incomeData;
-            const item = dataArray.find(i => i.id === id);
-
-            if (item && !isNaN(newAmount)) {
-                item.name = newName;
-                item.rawAmount = newAmount;
-                item.amount = newAmount.toLocaleString() + ".00 ₪";
-            }
-
-            closeEditModal();
-            updateTotals();
-        }
-
-        function addTransaction(e) {
-            e.preventDefault();
-            const desc = document.getElementById('tx-desc').value;
-            const amountVal = parseFloat(document.getElementById('tx-amount').value);
-            let category = document.getElementById('tx-category').value;
-            
-            if (category === 'אחר') {
-                const customCat = document.getElementById('tx-custom-category').value.trim();
-                if (customCat) {
-                    category = customCat;
+        expenseChart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: [
+                        "#f43f5e",
+                        "#fb7185",
+                        "#f59e0b",
+                        "#22c55e",
+                        "#3b82f6",
+                        "#8b5cf6",
+                        "#06b6d4",
+                        "#64748b"
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            font: { family: "Arial" }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return " " + context.label + ": " +
+                                    formatMoney(context.raw);
+                            }
+                        }
+                    }
                 }
             }
-
-            const formattedAmount = amountVal.toLocaleString() + ".00 ₪";
-            const fullName = `${desc} (${category})`;
-            const newItem = {
-                id: Date.now(),
-                name: fullName,
-                rawAmount: amountVal,
-                amount: formattedAmount
-            };
-
-            if (currentFormType === 'expense') {
-                expensesData.push(newItem);
-            } else {
-                incomeData.push(newItem);
-            }
-
-            updateTotals();
-            
-            document.getElementById('tx-desc').value = '';
-            document.getElementById('tx-amount').value = '';
-            document.getElementById('tx-custom-category').value = '';
-            document.getElementById('tx-category').value = 'דיור';
-            document.getElementById('custom-category-wrapper').style.display = 'none';
-        }
-
-        updateTotals();
-
-        const ctx = document.getElementById('expenseChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: { 
-                labels: ['שכ"ד', 'רכב ודלק', 'גן', 'אחר'], 
-                datasets: [{ 
-                    data: [6353, 2010, 1500, 3975], 
-                    backgroundColor: ['#f43f5e', '#fb7185', '#fda4af', '#fecdd3'] 
-                }] 
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
-    </script>
+    }
+
+    // סגירת חלון עריכה בלחיצה מחוץ לחלון
+    document.getElementById("edit-modal").addEventListener("click", function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+
+    // טעינה ראשונית
+    loadData();
+</script>
+
 </body>
 </html>
