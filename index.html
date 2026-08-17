@@ -253,6 +253,15 @@
         ["הנהלת חשבונות", 180, "אחר"]
     ];
 
+    // ההכנסות הקבועות מהקוד הישן שלך.
+    const FIXED_INCOMES = [
+        ["משכורת צבא", 8300, "הכנסות עבודה"],
+        ["עצמאי", 2000, "הכנסות עבודה"],
+        ["משכורת גולדי", 5000, "הכנסות עבודה"],
+        ["בונוס ניהול חנות", 1500, "הכנסות עבודה"],
+        ["ביטוח לאומי", 276, "הכנסות עבודה"]
+    ];
+
     // =========================================================
     // עזר
     // =========================================================
@@ -397,7 +406,7 @@
             const [name, amount, category] = FIXED_EXPENSES[i];
 
             await setDoc(
-                doc(db, "transactions", `fixed_${i + 1}`),
+                doc(db, "transactions", `fixed_expense_${i + 1}`),
                 {
                     name,
                     amount,
@@ -412,13 +421,35 @@
         }
     }
 
+    async function seedFixedIncomes() {
+        const today = getTodayISO();
+
+        for (let i = 0; i < FIXED_INCOMES.length; i++) {
+            const [name, amount, category] = FIXED_INCOMES[i];
+
+            await setDoc(
+                doc(db, "transactions", `fixed_income_${i + 1}`),
+                {
+                    name,
+                    amount,
+                    category,
+                    date: dateToTimestamp(today),
+                    desc: name,
+                    type: "income",
+                    isFixed: true
+                },
+                { merge: true }
+            );
+        }
+    }
+
     // =========================================================
     // טעינת נתונים בזמן אמת
     // =========================================================
 
     onSnapshot(
         transactionsRef,
-        (snapshot) => {
+        async (snapshot) => {
 
             transactions = snapshot.docs.map(snapshotDoc => ({
                 id: snapshotDoc.id,
@@ -427,12 +458,21 @@
 
             // אם ההוצאות הקבועות מהקוד הישן עדיין לא קיימות,
             // נכניס אותן לענן עם מזהים קבועים.
-            if (!transactions.some(item => item.isFixed)) {
+            if (!transactions.some(item => item.isFixed && item.type === "expense")) {
                 try {
                     await seedFixedExpenses();
                 } catch (error) {
                     console.error("Fixed expenses seed error:", error);
                     showStatus("לא הצלחתי להוסיף את ההוצאות הקבועות ל-Firebase.", true);
+                }
+            }
+
+            if (!transactions.some(item => item.isFixed && item.type === "income")) {
+                try {
+                    await seedFixedIncomes();
+                } catch (error) {
+                    console.error("Fixed incomes seed error:", error);
+                    showStatus("לא הצלחתי להוסיף את ההכנסות הקבועות ל-Firebase.", true);
                 }
             }
 
